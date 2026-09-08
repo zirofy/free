@@ -43,7 +43,7 @@
 <div class="kicker">ACCESSO GRATUITO</div>
 <h2 style="font-size:2rem">Mandami il Budget Reset</h2>
 <p class="muted">Il form conserva anche la provenienza della campagna.</p>
-<form class="form" id="leadForm" action="__WEBHOOK_URL__" method="POST">
+<form class="form" id="leadForm" action="/api/lead" method="POST">
 <input name="name" id="name" placeholder="Nome" autocomplete="name" required>
 <input name="email" id="email" type="email" placeholder="Email" autocomplete="email" required>
 <input type="hidden" name="utm_source" id="utm_source">
@@ -51,7 +51,7 @@
 <input type="hidden" name="utm_campaign" id="utm_campaign">
 <input type="hidden" name="utm_content" id="utm_content">
 <input type="hidden" name="utm_term" id="utm_term">
-<label class="check"><input type="checkbox" required> Accetto di ricevere il Budget Reset e le comunicazioni collegate al percorso, secondo la privacy policy.</label>
+<label class="check"><input type="checkbox" name="consent" value="yes" required> Accetto di ricevere il Budget Reset e le comunicazioni collegate al percorso, secondo la privacy policy.</label>
 <button class="btn" type="submit">MANDAMI IL BUDGET RESET GRATIS →</button>
 <div class="small">Nessuna carta. Nessun abbonamento richiesto.</div>
 </form>
@@ -84,12 +84,23 @@ const v=p.get("utm_"+k); const el=document.getElementById("utm_"+k); if(el) el.v
 localStorage.setItem("budget_reset_attribution", JSON.stringify(Object.fromEntries(
 ["source","medium","campaign","content","term"].map(k=>["utm_"+k,p.get("utm_"+k)||""])
 )));
-document.getElementById("leadForm").addEventListener("submit",function(e){
-if(this.action.includes("__WEBHOOK_URL__")){
+document.getElementById("leadForm").addEventListener("submit",async function(e){
 e.preventDefault();
-document.getElementById("status").textContent="Configura il WEBHOOK_URL in index.html prima della pubblicazione.";
-}
+const form=this;
+const status=document.getElementById("status");
+const button=form.querySelector("button[type=submit]");
+button.disabled=true;
+status.textContent="Invio in corso…";
+try{
+const response=await fetch(form.action,{method:"POST",body:new FormData(form),headers:{Accept:"application/json"}});
+const data=await response.json().catch(()=>({}));
+if(!response.ok || !data.ok) throw new Error(data.error||"Invio non riuscito.");
 if(window.BRTrack) BRTrack("generate_lead");
+window.location.href="/thank-you";
+}catch(error){
+status.textContent=error.message||"Non è stato possibile completare la richiesta. Riprova tra poco.";
+button.disabled=false;
+}
 });
 })();
 </script>
