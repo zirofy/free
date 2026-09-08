@@ -1,0 +1,72 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Budget Reset Solo</title><style>
+:root{--bg:#1A1A1A;--text:#FFF;--accent:#C8F135;--muted:#888;--card:#232323;--line:#383838}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+.app{display:flex;min-height:100vh}.side{width:240px;padding:24px;border-right:1px solid var(--line);position:fixed;height:100vh}
+.logo{font-size:22px;font-weight:900}.logo span{color:var(--accent)}.small{color:var(--muted);font-size:13px}
+.nav{display:grid;gap:7px;margin-top:35px}.nav button{border:0;background:none;color:#aaa;text-align:left;padding:12px;border-radius:9px;cursor:pointer}.nav button.active,.nav button:hover{background:#303030;color:#fff}
+.main{margin-left:240px;padding:32px;max-width:1450px;width:calc(100% - 240px)}header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}
+h1{font-size:32px;line-height:1.05;margin:0;letter-spacing:-.04em}h2{margin:8px 0}.sub{color:var(--muted);margin-top:7px}
+.grid{display:grid;gap:15px}.kpis{grid-template-columns:repeat(4,1fr)}.two{grid-template-columns:1.35fr .65fr}.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:19px}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em}.value{font-size:28px;font-weight:850;margin-top:7px}.accent{color:var(--accent)}
+input,select{width:100%;background:#181818;color:#fff;border:1px solid #4a4a4a;border-radius:9px;padding:11px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+button.btn{background:var(--accent);color:#111;border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}.btn.secondary{background:#333;color:#fff}.btn.danger{background:#4a2626;color:#fff}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.full{grid-column:1/-1}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.progress{height:10px;background:#333;border-radius:999px;overflow:hidden;margin:13px 0}.bar{height:100%;background:var(--accent);border-radius:999px}
+.view{display:none}.view.active{display:block}.pill{padding:4px 8px;border-radius:999px;background:#333;color:#bbb;font-size:12px}.pill.green{color:var(--accent);background:#303b14}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px;border-bottom:1px solid var(--line);font-size:14px}th{font-size:11px;color:#aaa;text-transform:uppercase}.empty{text-align:center;color:#777;padding:25px}
+.notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}
+@media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
+</style></head><body><div class="app">
+<aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
+<nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
+<main class="main">
+<section id="dash" class="view active"><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><button class="btn secondary" onclick="resetData()">Reset</button></header>
+<div class="grid kpis"><div class="card"><div class="label">Entrate</div><div id="inc" class="value">€0</div></div><div class="card"><div class="label">Spese</div><div id="exp" class="value">€0</div></div><div class="card"><div class="label">Disponibile</div><div id="avail" class="value accent">€0</div></div><div class="card"><div class="label">Risparmio</div><div id="rate" class="value">0%</div></div></div>
+<div class="grid two" style="margin-top:15px"><div class="card"><div class="row"><div><div class="label">Budget mensile</div><h2>Quanto puoi ancora spendere?</h2></div><span id="bp" class="pill green">0%</span></div><div class="progress"><div id="bb" class="bar" style="width:0%"></div></div><div class="row small"><span id="st">€0 spesi</span><span id="bt">Budget €0</span></div></div>
+<div class="card"><div class="label">Prossima azione</div><h2 id="next">Inserisci l'entrata.</h2><div class="small">Una decisione alla volta.</div></div></div>
+<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrate</div><input id="income" type="number" step=".01" placeholder="2000"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva</button></div>
+<div class="card"><div class="label">Budget</div><input id="budget" type="number" step=".01" placeholder="1500"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva</button></div>
+<div class="card"><div class="label">Principio</div><div class="small" style="margin-top:8px">Misura ciò che accade davvero. Poi fai una piccola correzione.</div></div></div></section>
+
+<section id="expenses" class="view"><header><div><h1>Spese</h1><div class="sub">Registrale in pochi secondi.</div></div></header><div class="card"><div class="formgrid">
+<input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div></div>
+<div class="card" style="margin-top:15px"><table><thead><tr><th>Descrizione</th><th>Categoria</th><th>Importo</th><th></th></tr></thead><tbody id="table"></tbody></table></div></section>
+
+<section id="goals" class="view"><header><div><h1>Obiettivi</h1><div class="sub">Dai un numero e una destinazione al risparmio.</div></div></header>
+<div class="card"><div class="formgrid"><input id="gn" placeholder="es. Fondo emergenza"><input id="gt" type="number" step=".01" placeholder="Obiettivo €"><input id="gs" type="number" step=".01" placeholder="Già accumulato €"><button class="btn" onclick="addGoal()">Crea obiettivo</button></div></div>
+<div id="goals" class="grid three" style="margin-top:15px"></div><div style="margin-top:15px">
+<div class="card"><div class="label">Fondo emergenza</div><h2>Definisci la tua protezione</h2>
+<div class="formgrid"><input id="em" type="number" step=".01" placeholder="Obiettivo €"><input id="emm" type="number" placeholder="Mesi di spese">
+<button class="btn" onclick="saveEmergency()">Salva obiettivo</button></div><p id="emtxt" class="small"></p></div>
+</div></section>
+
+<section id="review" class="view"><header><div><h1>Review settimanale</h1><div class="sub">5 minuti per decidere la prossima settimana.</div></div></header>
+<div class="card"><div class="grid"><input id="q1" placeholder="Quale spesa ti ha sorpreso?"><input id="q2" placeholder="Cosa potresti ridurre senza sacrifici?"><select id="q3"><option>Sono dentro il budget</option><option>Sono quasi dentro</option><option>Sono oltre il budget</option></select><input id="q4" placeholder="Priorità della prossima settimana"><input id="q5" placeholder="Una azione entro 24 ore"><button class="btn" onclick="saveReview()">Salva review</button><div id="saved" class="notice" style="display:none">Review salvata. Hai una prossima azione.</div></div></div></section>
+</main></div>
+<script>
+const KEY="budget_reset_solo";
+let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{}}');
+const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
+function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
+function setIncome(){d.income=+document.getElementById('income').value||0;save()}
+function setBudget(){d.budget=+document.getElementById('budget').value||0;save()}
+function addExpense(){let x=document.getElementById('desc').value,a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value;if(!x||a<=0)return;d.expenses.push({x,a,c});document.getElementById('desc').value='';document.getElementById('amount').value='';save()}
+function del(i){d.expenses.splice(i,1);save()}
+function addGoal(){let n=document.getElementById('gn').value,t=+document.getElementById('gt').value||0,s=+document.getElementById('gs').value||0;if(!n||t<=0)return;d.goals.push({n,t,s});save()}
+function saveReview(){document.getElementById('saved').style.display='block'}
+function resetData(){if(confirm('Cancellare i dati salvati?')){localStorage.removeItem(KEY);location.reload()}}
+function saveEmergency(){
+d.emergency={target:+document.getElementById("em").value||0,months:+document.getElementById("emm").value||0};save();
+}
+function render(){
+let total=d.expenses.reduce((s,x)=>s+x.a,0),av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
+document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(d.budget);
+document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
+document.getElementById('table').innerHTML=d.expenses.length?d.expenses.map((x,i)=>`<tr><td>${x.x}</td><td><span class="pill">${x.c}</span></td><td>${eur(x.a)}</td><td><button class="btn danger" onclick="del(${i})">×</button></td></tr>`).join(''):'<tr><td colspan="4" class="empty">Nessuna spesa.</td></tr>';
+document.getElementById('goals').innerHTML=d.goals.length?d.goals.map(g=>{let q=Math.min(100,g.s/g.t*100);return `<div class="card"><div class="label">${g.n}</div><div class="value">${eur(g.s)}</div><div class="progress"><div class="bar" style="width:${q}%"></div></div><div class="small">${q.toFixed(0)}% di ${eur(g.t)}</div></div>`}).join(''):'<div class="card"><div class="empty">Crea il primo obiettivo.</div></div>';
+let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;document.getElementById("split").textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
+}
+render();
+</script></body></html>

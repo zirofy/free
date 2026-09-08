@@ -1,0 +1,52 @@
+BUDGET RESET — AUTOMATION BLUEPRINT
+
+TRIGGER
+Lead submitted on landing page
+
+IMMEDIATE
+- Add contact to list: BR_Free_Solo
+- Store UTM source / medium / campaign / content / term
+- Tag: lead_freebie
+- Send Email 0
+- Redirect to /thank-you.html
+- Fire event: generate_lead
+
+DAY 1
+Condition: lead_freebie AND not customer
+Send Email 1
+Tag: email_d1
+
+DAY 3
+Send Email 2
+Tag: email_d3
+
+DAY 5
+Send Email 3
+Tag: intent_signal
+
+DAY 7
+Send Email 4
+Tag: offer_solo_pro
+
+WHEN PURCHASE = TRUE
+- remove from promotional sequence
+- tag customer_solo_pro
+- start onboarding sequence
+
+RE-ENGAGEMENT
+After 21 days with no engagement:
+send one reactivation email.
+If no engagement after that:
+reduce promotional frequency.
+
+CRM FIELDS
+name, email, utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+lead_created_at, lead_source, product_stage, last_click_at
+
+TAGS
+lead_freebie
+email_d1
+email_d3
+intent_signal
+offer_solo_pro
+customer_solo_pro

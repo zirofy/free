@@ -1,0 +1,21 @@
+BUDGET RESET — TRACKING EVENTS
+
+page_view
+generate_lead
+start_budget
+budget_completed
+goal_created
+email_click
+offer_view
+checkout_started
+purchase
+
+FUNNEL
+Traffic -> Landing -> Lead -> Activation -> Intent -> Offer -> Checkout -> Purchase
+
+PRIMARY KPIs
+Lead Conversion Rate
+Activation Rate
+Goal Creation Rate
+Checkout Start Rate
+Purchase Rate

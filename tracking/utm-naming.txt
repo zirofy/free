@@ -1,0 +1,15 @@
+BUDGET RESET — UTM NAMING
+
+Instagram Reel:
+?utm_source=instagram&utm_medium=reel&utm_campaign=leadgen_sep26&utm_content=saldo_budget
+
+TikTok:
+?utm_source=tiktok&utm_medium=video&utm_campaign=leadgen_sep26&utm_content=5_euro
+
+YouTube Shorts:
+?utm_source=youtube&utm_medium=shorts&utm_campaign=leadgen_sep26&utm_content=budget_non_saldo
+
+Bio:
+?utm_source=instagram&utm_medium=bio&utm_campaign=always_on&utm_content=profile
+
+Regola: una creatività = un utm_content univoco.

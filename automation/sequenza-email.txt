@@ -1,0 +1,46 @@
+BUDGET RESET — EMAIL NURTURE 7 GIORNI
+
+EMAIL 0 — IMMEDIATA
+Oggetto: Il tuo Budget Reset è pronto
+Preheader: Ti bastano 10 minuti per vedere dove finiscono davvero i soldi.
+Ciao {{nome}},
+il tuo Budget Reset è qui.
+Prima di cercare di “risparmiare di più”, fai una cosa semplice: scopri quanto puoi davvero spendere.
+[APRI IL BUDGET RESET]
+Domani partiamo da un errore comune: confondere stipendio e budget.
+
+EMAIL 1 — GIORNO 1
+Oggetto: Il tuo stipendio non è il tuo budget
+Preheader: Il conto dice quanto hai. Il budget dice cosa puoi fare.
+Ciao {{nome}},
+100 € sul conto non significano 100 € disponibili.
+Magari devono ancora uscire affitto, bollette, abbonamenti o una spesa già prevista.
+Il budget serve a trasformare “quanto ho?” in “quanto posso davvero spendere?”.
+[VEDI IL TUO NUMERO]
+
+EMAIL 2 — GIORNO 3
+Oggetto: Le spese che non senti
+Preheader: Non sono grandi acquisti. Sono tante piccole decisioni.
+Ciao {{nome}},
+5 € qui. 8 € là. Un rinnovo automatico. Una consegna.
+Il problema non è una singola spesa. È non sapere quanto spazio occupa nel mese.
+Apri il Reset e guarda le uscite per categoria.
+[FAI IL CHECK]
+
+EMAIL 3 — GIORNO 5
+Oggetto: Una domanda prima di comprare
+Preheader: Provala per una settimana.
+Ciao {{nome}},
+prima di una spesa non chiederti “me lo posso permettere?”.
+Chiediti: “Questa spesa entra davvero nel mio budget?”
+Se non sai la risposta, controlla il tuo numero disponibile.
+[CONTROLLA IL BUDGET]
+
+EMAIL 4 — GIORNO 7
+Oggetto: Il primo Reset è fatto. E adesso?
+Preheader: Il prossimo passo non è fare un budget perfetto.
+Ciao {{nome}},
+hai trasformato le uscite da sensazione a numeri.
+Ora puoi costruire una routine: controllo settimanale, obiettivo di risparmio e decisioni più semplici.
+Se vuoi un sistema più completo, qui trovi Budget Reset Solo PRO.
+[SCOPRI BUDGET RESET SOLO PRO]

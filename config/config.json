@@ -1,0 +1,15 @@
+{
+  "brand": "Budget Reset",
+  "palette": {
+    "background": "#1A1A1A",
+    "text": "#FFFFFF",
+    "accent": "#C8F135",
+    "secondary": "#888888"
+  },
+  "webhook_url": "__WEBHOOK_URL__",
+  "ga4_measurement_id": "__GA4_ID__",
+  "meta_pixel_id": "__META_PIXEL_ID__",
+  "tiktok_pixel_id": "__TIKTOK_PIXEL_ID__",
+  "pro_offer_url": "__PRO_OFFER_URL__",
+  "privacy_url": "__PRIVACY_URL__"
+}
