@@ -27,11 +27,6 @@ export async function onRequestPost(context) {
       return Response.json({ ok: false, error: "Servizio email non configurato." }, { status: 500 });
     }
 
-    const utmLines = Object.entries(utm)
-      .filter(([, value]) => value)
-      .map(([key, value]) => `<li><strong>${key}</strong>: ${escapeHtml(value)}</li>`)
-      .join("");
-
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -39,22 +34,25 @@ export async function onRequestPost(context) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Budget Reset <reset@zirofy.app>",
+        from: "Budget Reset <support@zirofy.app>",
+        reply_to: "support@zirofy.app",
         to: [email],
-        subject: "Il tuo Budget Reset è pronto ✅",
+        subject: "Il tuo Budget Reset è pronto",
+        text: `Ciao ${name},\n\nhai fatto il primo passo.\n\nIl tuo Budget Reset gratuito è pronto.\n\nAprilo qui:\nhttps://zirofy.app/free-app/budget-reset-solo.html\n\nTi bastano circa 10 minuti per inserire entrate e spese e capire quanto puoi davvero spendere questo mese.\n\nNei prossimi giorni ti accompagneremo con indicazioni semplici per trasformare il primo reset in un'abitudine.\n\nA presto,\nBudget Reset`,
         html: `
           <div style="font-family:Arial,sans-serif;line-height:1.6;color:#171717;max-width:640px;margin:0 auto;padding:24px">
-            <h1 style="margin:0 0 12px">Ciao ${escapeHtml(name)},</h1>
-            <p>hai fatto il primo passo. Il tuo <strong>Budget Reset</strong> è qui.</p>
+            <p>Ciao ${escapeHtml(name)},</p>
+            <p>hai fatto il primo passo.</p>
+            <p>Il tuo <strong>Budget Reset gratuito</strong> è pronto.</p>
             <p>
               <a href="https://zirofy.app/free-app/budget-reset-solo.html"
                  style="display:inline-block;padding:14px 20px;background:#c6ff2d;color:#111;text-decoration:none;border-radius:8px;font-weight:700">
                 APRI IL BUDGET RESET →
               </a>
             </p>
-            <p>Dedica circa 10 minuti: inserisci entrate e uscite e scopri quanto puoi davvero spendere.</p>
+            <p>Ti bastano circa 10 minuti per inserire entrate e spese e capire quanto puoi davvero spendere questo mese.</p>
             <p>Nei prossimi giorni ti accompagneremo con indicazioni semplici per trasformare il primo reset in un'abitudine.</p>
-            ${utmLines ? `<hr style="border:0;border-top:1px solid #ddd;margin:24px 0"><p style="font-size:12px;color:#666">Dati di provenienza della richiesta:</p><ul style="font-size:12px;color:#666">${utmLines}</ul>` : ""}
+            <p>A presto,<br>Budget Reset</p>
           </div>
         `
       })
