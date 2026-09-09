@@ -1,108 +1,118 @@
 <!doctype html>
 <html lang="it">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Budget Reset — Gratis</title>
-<meta name="description" content="Capisci dove finiscono davvero i tuoi soldi in meno di 10 minuti.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Budget Reset — Riprendi il controllo dei tuoi soldi</title>
+<meta name="description" content="Budget Reset ti aiuta a capire quanto puoi davvero spendere, organizzare le tue spese e costruire un margine ogni mese. Gratis.">
+<meta name="theme-color" content="#111111">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="announcement">BUDGET RESET <span>•</span> IL TUO PRIMO RESET È GRATIS</div>
 <div class="wrap">
-<nav class="nav"><div class="logo">BUDGET <span>RESET</span></div><a class="btn" href="#download">SCARICA GRATIS →</a></nav>
+<nav class="nav" aria-label="Navigazione principale">
+  <a class="logo" href="/">BUDGET <span>RESET</span></a>
+  <a class="btn btn-small" href="#download">SCARICA GRATIS <b>→</b></a>
+</nav>
 
-<header class="hero">
-<div class="kicker">BUDGET RESET — GRATIS</div>
-<h1>Dove finiscono davvero i tuoi soldi?</h1>
-<p class="lead">Il planner gratuito per capire dove finiscono i tuoi soldi, vedere quanto puoi davvero spendere e iniziare a costruire un margine ogni mese.</p>
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px">
-<a class="btn" href="#download">VOGLIO IL MIO BUDGET RESET →</a>
-<span class="badge">10 minuti • zero Excel • zero linguaggio complicato</span>
-</div>
-</header>
-
-<section><div class="grid grid3">
-<div class="card"><strong>Fine mese = sorpresa?</strong><span class="muted">Il saldo del conto ti dice quanto hai. Non quanto puoi permetterti.</span></div>
-<div class="card"><strong>Risparmi “quello che resta”?</strong><span class="muted">Così il risparmio diventa il risultato del mese, non una decisione.</span></div>
-<div class="card"><strong>Le piccole spese spariscono?</strong><span class="muted">Abbonamenti, delivery e acquisti impulsivi si sommano senza farsi notare.</span></div>
-</div></section>
-
-<section id="download">
-<div class="grid grid2" style="align-items:start">
-<div>
-<div class="kicker">IL TUO PRIMO RESET</div>
-<h2>Non devi diventare bravo con i numeri. Devi vedere la tua realtà.</h2>
-<p class="lead">In pochi passaggi inserisci entrate e uscite, trovi il tuo budget disponibile e scegli un obiettivo concreto.</p>
-<div class="grid" style="margin-top:20px">
-<div class="card"><strong>01 — Inserisci</strong><span class="muted">Entrate, spese fisse, variabili e abbonamenti.</span></div>
-<div class="card"><strong>02 — Scopri</strong><span class="muted">Quanto resta davvero dopo le spese che contano.</span></div>
-<div class="card"><strong>03 — Decidi</strong><span class="muted">Un piccolo obiettivo di risparmio sostenibile.</span></div>
-</div>
-</div>
-
-<div class="card">
-<div class="kicker">ACCESSO GRATUITO</div>
-<h2 style="font-size:2rem">Mandami il Budget Reset</h2>
-<p class="muted">Il form conserva anche la provenienza della campagna.</p>
-<form class="form" id="leadForm" action="/api/lead" method="POST">
-<input name="name" id="name" placeholder="Nome" autocomplete="name" required>
-<input name="email" id="email" type="email" placeholder="Email" autocomplete="email" required>
-<input type="hidden" name="utm_source" id="utm_source">
-<input type="hidden" name="utm_medium" id="utm_medium">
-<input type="hidden" name="utm_campaign" id="utm_campaign">
-<input type="hidden" name="utm_content" id="utm_content">
-<input type="hidden" name="utm_term" id="utm_term">
-<label class="check"><input type="checkbox" name="consent" value="yes" required> Accetto di ricevere il Budget Reset e le comunicazioni collegate al percorso, secondo la privacy policy.</label>
-<button class="btn" type="submit">MANDAMI IL BUDGET RESET GRATIS →</button>
-<div class="small">Nessuna carta. Nessun abbonamento richiesto.</div>
-</form>
-<div id="status" class="small" style="margin-top:12px"></div>
-</div>
-</div>
+<main>
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow">UN NUOVO MODO DI GUARDARE AL TUO BUDGET</div>
+    <h1>Non devi guadagnare di più.<br><em>Devi sapere cosa puoi spendere.</em></h1>
+    <p class="lead">Budget Reset è il punto di partenza per mettere ordine nelle tue finanze: in circa 10 minuti trasformi entrate e spese in un numero semplice da capire.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#download">VOGLIO IL MIO BUDGET RESET GRATIS <b>→</b></a>
+      <span class="micro">Nessuna carta · Nessun abbonamento · Parti in 10 minuti</span>
+    </div>
+  </div>
+  <div class="hero-visual" aria-label="Anteprima della web app Budget Reset">
+    <div class="browser">
+      <div class="browser-bar"><span></span><span></span><span></span><i>budget-reset</i></div>
+      <div class="app-head"><div><small>BUDGET RESET</small><strong>Il tuo mese</strong></div><div class="avatar">BR</div></div>
+      <div class="balance"><small>PUOI DAVVERO SPENDERE</small><strong>€ 842,00</strong><div class="progress"><span></span></div><small>Restano 18 giorni</small></div>
+      <div class="mini-grid"><div><small>ENTRATE</small><b>€ 1.850</b></div><div><small>SPESE</small><b>€ 1.008</b></div></div>
+      <div class="chart"><div class="chart-label"><b>Andamento del mese</b><small>+12% margine</small></div><div class="bars"><i style="height:45%"></i><i style="height:62%"></i><i style="height:40%"></i><i style="height:70%"></i><i style="height:52%"></i><i style="height:82%"></i><i style="height:64%"></i></div></div>
+    </div>
+  </div>
 </section>
 
-<section><div class="card"><div class="grid grid2" style="align-items:center">
-<div><div class="kicker">IL MOMENTO GIUSTO</div><h2>“Questa spesa entra davvero nel mio budget?”</h2><p class="muted">Budget Reset trasforma questa domanda in una risposta concreta.</p></div>
-<div><div class="stat">10 min</div><div class="muted">per fare il primo reset</div><div class="stat" style="margin-top:18px">1 numero</div><div class="muted">da controllare ogni settimana: quanto puoi davvero spendere</div></div>
-</div></div></section>
+<section class="trust-strip"><span>SEMPLICE</span><span>CONCRETO</span><span>SENZA EXCEL</span><span>PARTI GRATIS</span></section>
 
-<section><div class="kicker">DOPO IL FREEBIE</div><h2>Il download è solo l’inizio.</h2><p class="lead">Le email trasformano la prima vittoria in abitudine. Poi Budget Reset Solo PRO monetizza il problema già riconosciuto.</p>
-<div class="grid grid3">
-<div class="card"><strong>Lead</strong><span class="muted">Budget Reset Starter gratuito</span></div>
-<div class="card"><strong>Activation</strong><span class="muted">Primo budget compilato + primo obiettivo</span></div>
-<div class="card"><strong>Conversion</strong><span class="muted">Budget Reset Solo PRO</span></div>
-</div></section>
+<section class="problem">
+  <div class="section-intro"><div class="eyebrow">SE TI RICONOSCI, SEI NEL POSTO GIUSTO</div><h2>Il problema non è sempre quanto guadagni.</h2><p>Spesso è non sapere cosa succede ai tuoi soldi durante il mese.</p></div>
+  <div class="grid grid3">
+    <article class="feature-card"><span class="number">01</span><h3>Il saldo ti confonde</h3><p>Vedi quanti soldi hai sul conto, ma non sai quanto puoi spendere senza compromettere il resto del mese.</p></article>
+    <article class="feature-card"><span class="number">02</span><h3>Le piccole spese si sommano</h3><p>Abbonamenti, delivery, acquisti veloci: prese singolarmente sembrano poco. Insieme cambiano il tuo mese.</p></article>
+    <article class="feature-card"><span class="number">03</span><h3>Il risparmio resta per ultimo</h3><p>Se aspetti di vedere cosa rimane, spesso non rimane nulla. Un obiettivo va deciso prima.</p></article>
+  </div>
+</section>
+
+<section class="how">
+  <div class="section-intro centered"><div class="eyebrow">COME FUNZIONA</div><h2>Da “non so dove finiscono”<br> a “so cosa posso fare”.</h2><p>Tre passaggi. Un solo obiettivo: rendere il tuo budget leggibile.</p></div>
+  <div class="steps">
+    <div class="step"><span>01</span><div><h3>Inserisci</h3><p>Entrate, spese fisse, variabili e abbonamenti. Senza formule complicate.</p></div></div>
+    <div class="step"><span>02</span><div><h3>Scopri</h3><p>Il tuo margine reale e quanto puoi destinare alle spese del mese.</p></div></div>
+    <div class="step"><span>03</span><div><h3>Decidi</h3><p>Un obiettivo sostenibile e un numero da controllare durante il mese.</p></div></div>
+  </div>
+</section>
+
+<section class="app-section">
+  <div class="app-copy"><div class="eyebrow">NON È UN FOGLIO EXCEL</div><h2>Il budget diventa uno strumento che puoi usare davvero.</h2><p>Budget Reset è pensato per essere consultato quando serve: prima di una spesa, a metà mese, quando arriva lo stipendio.</p><ul><li><b>Un numero chiaro</b><span>Quanto puoi davvero spendere.</span></li><li><b>Un obiettivo</b><span>Quanto vuoi mettere da parte.</span></li><li><b>Una visione</b><span>Dove stanno andando le tue risorse.</span></li></ul></div>
+  <div class="phone-wrap"><div class="phone"><div class="phone-notch"></div><div class="phone-screen"><small>BUDGET RESET</small><h3>Questo mese</h3><div class="phone-total">€ 842 <span>disponibili</span></div><div class="phone-row"><span>Casa</span><b>€ 520</b></div><div class="phone-row"><span>Spese</span><b>€ 188</b></div><div class="phone-row"><span>Obiettivo</span><b>€ 150</b></div><div class="phone-cta">CONTROLLA IL TUO BUDGET</div></div></div></div>
+</section>
+
+<section class="audience">
+  <div class="section-intro"><div class="eyebrow">PER CHI È</div><h2>Per chi vuole smettere di andare a intuito.</h2></div>
+  <div class="audience-grid"><div><b>Se a fine mese ti chiedi dove siano finiti i soldi.</b></div><div><b>Se vuoi iniziare a risparmiare senza fissare obiettivi impossibili.</b></div><div><b>Se vuoi capire una spesa prima di farla.</b></div><div><b>Se vuoi un metodo semplice, non un altro foglio da compilare.</b></div></div>
+</section>
+
+<section class="download" id="download">
+  <div class="download-copy"><div class="eyebrow">IL PRIMO PASSO È GRATIS</div><h2>Fai il tuo primo Budget Reset.</h2><p>Lascia la tua email e ricevi l'accesso al Budget Reset gratuito. Poi puoi iniziare subito a costruire il tuo primo budget.</p><div class="check-list"><span>✓ Accesso gratuito</span><span>✓ Circa 10 minuti</span><span>✓ Nessuna carta richiesta</span></div></div>
+  <div class="form-card">
+    <div class="form-top"><span>01</span><b>RICEVI IL TUO ACCESSO</b></div>
+    <form class="form" id="leadForm" action="/api/lead" method="POST">
+      <label>Nome<input name="name" id="name" placeholder="Come ti chiami?" autocomplete="name" required></label>
+      <label>Email<input name="email" id="email" type="email" placeholder="La tua email" autocomplete="email" required></label>
+      <input type="hidden" name="utm_source" id="utm_source"><input type="hidden" name="utm_medium" id="utm_medium"><input type="hidden" name="utm_campaign" id="utm_campaign"><input type="hidden" name="utm_content" id="utm_content"><input type="hidden" name="utm_term" id="utm_term">
+      <input type="hidden" name="landing_version" value="2.0">
+      <label class="check"><input type="checkbox" name="consent" value="yes" required><span>Accetto di ricevere il Budget Reset e le comunicazioni collegate al percorso, secondo la <a href="/privacy.html">privacy policy</a>.</span></label>
+      <button class="btn" type="submit">SCARICA GRATIS <b>→</b></button>
+      <div id="status" class="form-status" role="status"></div>
+      <p class="form-note">I tuoi dati vengono usati per inviarti l'accesso e accompagnarti nel percorso Budget Reset.</p>
+    </form>
+  </div>
+</section>
+
+<section class="journey">
+  <div class="section-intro centered"><div class="eyebrow">NON FINISCE CON IL DOWNLOAD</div><h2>Il percorso continua.</h2><p>Il primo Budget Reset ti dà chiarezza. Le email ti aiutano a trasformarla in abitudine. L'app diventa il tuo punto di riferimento.</p></div>
+  <div class="journey-line"><div><span>01</span><b>REEL</b><small>Scopri un problema</small></div><div><span>02</span><b>LANDING</b><small>Capisci il metodo</small></div><div><span>03</span><b>FREE</b><small>Fai il primo reset</small></div><div><span>04</span><b>APP</b><small>Usalo nel mese</small></div><div><span>05</span><b>PRO</b><small>Vai più in profondità</small></div></div>
+</section>
+
+<section class="faq">
+  <div class="section-intro"><div class="eyebrow">FAQ</div><h2>Le domande più semplici.</h2></div>
+  <div class="faq-list">
+    <details><summary>Budget Reset è davvero gratuito?</summary><p>Sì. Il primo Budget Reset è pensato come accesso gratuito al percorso. Non serve inserire una carta.</p></details>
+    <details><summary>Quanto tempo ci vuole?</summary><p>Per il primo reset considera circa 10 minuti. L'obiettivo è darti una fotografia utile senza trasformare il budget in un lavoro.</p></details>
+    <details><summary>Devo essere bravo con Excel o con i numeri?</summary><p>No. Il percorso è costruito per rendere semplici le informazioni che normalmente risultano confuse.</p></details>
+    <details><summary>Devo collegare il mio conto bancario?</summary><p>No. Il primo Budget Reset parte dai dati che inserisci tu.</p></details>
+    <details><summary>Cosa succede dopo aver lasciato l'email?</summary><p>Ricevi l'accesso al Budget Reset e una sequenza di email con indicazioni pratiche per trasformare il primo reset in un'abitudine.</p></details>
+  </div>
+</section>
+</main>
+
+<footer class="footer"><div class="footer-inner"><div><a class="logo" href="/">BUDGET <span>RESET</span></a><p>Più chiarezza. Meno decisioni a caso.</p></div><div class="footer-links"><a href="/privacy.html">Privacy</a><a href="/privacy.html#cookie">Cookie</a><a href="mailto:support@zirofy.app">Contatti</a></div></div><div class="footer-bottom">© 2026 Budget Reset · Tutti i diritti riservati</div></footer>
 </div>
-
-<footer class="footer"><div class="wrap">BUDGET RESET • Privacy • Cookie • Contatti</div></footer>
-
 <script>
 (function(){
 const p=new URLSearchParams(location.search);
-["source","medium","campaign","content","term"].forEach(k=>{
-const v=p.get("utm_"+k); const el=document.getElementById("utm_"+k); if(el) el.value=v||"";
-});
-localStorage.setItem("budget_reset_attribution", JSON.stringify(Object.fromEntries(
-["source","medium","campaign","content","term"].map(k=>["utm_"+k,p.get("utm_"+k)||""])
-)));
-document.getElementById("leadForm").addEventListener("submit",async function(e){
-e.preventDefault();
-const form=this;
-const status=document.getElementById("status");
-const button=form.querySelector("button[type=submit]");
-button.disabled=true;
-status.textContent="Invio in corso…";
-try{
-const response=await fetch(form.action,{method:"POST",body:new FormData(form),headers:{Accept:"application/json"}});
-const data=await response.json().catch(()=>({}));
-if(!response.ok || !data.ok) throw new Error(data.error||"Invio non riuscito.");
-if(window.BRTrack) BRTrack("generate_lead");
-window.location.href="/thank-you";
-}catch(error){
-status.textContent=error.message||"Non è stato possibile completare la richiesta. Riprova tra poco.";
-button.disabled=false;
-}
-});
+["source","medium","campaign","content","term"].forEach(k=>{const v=p.get("utm_"+k);const el=document.getElementById("utm_"+k);if(el)el.value=v||"";});
+localStorage.setItem("budget_reset_attribution",JSON.stringify(Object.fromEntries(["source","medium","campaign","content","term"].map(k=>["utm_"+k,p.get("utm_"+k)||""]))));
+const form=document.getElementById("leadForm");
+form.addEventListener("submit",async function(e){e.preventDefault();const status=document.getElementById("status"),button=form.querySelector("button");button.disabled=true;status.textContent="Invio in corso…";try{const response=await fetch(form.action,{method:"POST",body:new FormData(form),headers:{Accept:"application/json"}});const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.error||"Invio non riuscito.");if(window.BRTrack)BRTrack("generate_lead");window.location.href="/thank-you";}catch(error){status.textContent=error.message||"Non è stato possibile completare la richiesta. Riprova tra poco.";button.disabled=false;}});
 })();
 </script>
 <script src="tracking.js"></script>
-</body></html>
+</body>
+</html>
