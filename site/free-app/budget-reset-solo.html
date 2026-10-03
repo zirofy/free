@@ -28,7 +28,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrate</div><input id="income" type="number" step=".01" placeholder="2000"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva</button></div>
 <div class="card"><div class="label">Budget</div><input id="budget" type="number" step=".01" placeholder="1500"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva</button></div>
 <div class="card"><div class="label">Principio</div><div class="small" style="margin-top:8px">Misura ciò che accade davvero. Poi fai una piccola correzione.</div></div></div>
-<div class="grid two" style="margin-top:15px"><div class="card"><div class="label">Rate registrate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div></div></section>
+<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Rate pagate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div><div id="instCountdownCard" class="card"><div class="label">Countdown</div><div id="instCountdown" class="value accent">—</div><div id="instCountdownText" class="small">Nessuna scadenza imminente.</div></div></div></section>
 
 <section id="expenses" class="view"><header><div><h1>Spese</h1><div class="sub">Registrale in pochi secondi.</div></div></header><div class="card"><div class="formgrid">
 <input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div></div>
@@ -46,7 +46,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <section id="installments" class="view"><header><div><h1>Rate</h1><div class="sub">Tieni sotto controllo gli acquisti pagati a rate. La prima rata parte dalla data indicata; le successive vengono generate automaticamente ogni mese.</div></div></header>
 <div class="card"><div class="notice"><strong>Come funziona</strong><br><span class="small">Inserisci il debito totale, il numero di rate e la data della prima rata. Budget Reset registra automaticamente ogni rata nella Dashboard quando arriva la sua data.</span></div>
 <div class="formgrid" style="margin-top:15px"><input id="iDesc" placeholder="es. Smartphone"><input id="iTotal" type="number" step=".01" min="0" placeholder="Importo totale €"><select id="iCount"></select><input id="iDate" type="date"><button class="btn" onclick="addInstallment()">+ Aggiungi acquisto a rate</button></div>
-<div class="small" style="margin-top:10px">Esempio: €600 in 3 rate → €200 subito, poi €200 il mese successivo e €200 quello dopo.</div></div>
+<div class="small" style="margin-top:10px">Esempio: €600 in 3 rate con prima scadenza il 02/10 → €200 il 02/10, €200 il 02/11 e €200 il 02/12. Le scadenze restano sullo stesso giorno del mese.</div></div>
 <div id="installmentsList" class="grid" style="margin-top:15px"></div></section>
 
 <section id="review" class="view"><header><div><h1>Review settimanale</h1><div class="sub">5 minuti per decidere la prossima settimana.</div></div></header>
@@ -67,7 +67,16 @@ function todayKey(){return localDateKey(new Date())}
 function addMonthsClamped(dateStr,months){const src=new Date(dateStr+'T12:00:00');const day=src.getDate();const out=new Date(src.getFullYear(),src.getMonth()+months,1,12);const lastDay=new Date(out.getFullYear(),out.getMonth()+1,0,12).getDate();out.setDate(Math.min(day,lastDay));return localDateKey(out)}
 function monthKey(dateStr){return (dateStr||'').slice(0,7)}
 function formatDate(dateStr){if(!dateStr)return '—';const p=dateStr.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
-function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.round((b-a)/86400000)}
+function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.max(-9999,Math.round((b-a)/86400000))}
+function countdownText(days){
+  if(days<0)return 'Scaduta da '+Math.abs(days)+' '+(Math.abs(days)===1?'giorno':'giorni');
+  if(days===0)return 'Scade oggi';
+  if(days===1)return 'Manca 1 giorno';
+  return 'Mancano '+days+' giorni';
+}
+function countdownClass(days){
+  return days<=5?'notice':'card';
+}
 function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
 function setIncome(){d.income=+document.getElementById('income').value||0;save()}
 function setBudget(){d.budget=+document.getElementById('budget').value||0;save()}
@@ -114,6 +123,7 @@ function installmentStatus(pay){
   const days=daysFromToday(pay.due);
   if(days<0)return '<span class="pill" style="color:#ffb3b3;background:#4a2626">Scaduta</span>';
   if(days===0)return '<span class="pill" style="color:#111;background:var(--accent)">Oggi</span>';
+  if(days<=5)return '<span class="pill" style="color:#111;background:var(--accent)">Tra '+days+' gg</span>';
   return '<span class="pill">Tra '+days+' gg</span>';
 }
 function renderInstallments(){
@@ -138,8 +148,17 @@ function render(){
   document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
   document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(d.budget);
   const allFuture=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.paid).sort((a,b)=>a.due.localeCompare(b.due));
-  const due=allFuture.find(x=>x.due<=todayKey()),nextRate=allFuture[0];
+  const due=allFuture.find(x=>x.due<=todayKey()),nextRate=allFuture[0],nextRateDays=nextRate?daysFromToday(nextRate.due):null;
   document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':due?'Hai una rata da verificare: '+eur(due.amount):nextRate?'Prossima rata: '+eur(nextRate.amount)+' il '+formatDate(nextRate.due):!d.goals.length?'Crea il tuo primo obiettivo.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
+  const countdownCard=document.getElementById('instCountdownCard'),countdown=document.getElementById('instCountdown'),countdownTextEl=document.getElementById('instCountdownText');
+  if(nextRate){
+    countdown.textContent=countdownText(nextRateDays);
+    countdownTextEl.textContent=nextRate.debt.name+' · rata '+nextRate.n+'/'+nextRate.debt.count+' · '+formatDate(nextRate.due);
+    if(nextRateDays<=5){countdownCard.className='notice';countdownCard.style.borderLeft='3px solid var(--accent)';}
+    else{countdownCard.className='card';countdownCard.style.borderLeft='';}
+  }else{
+    countdown.textContent='—';countdownTextEl.textContent='Nessuna scadenza futura.';countdownCard.className='card';countdownCard.style.borderLeft='';
+  }
   document.getElementById('table').innerHTML=d.expenses.length?d.expenses.map((x,i)=>'<tr><td>'+x.x+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>').join(''):'<tr><td colspan="4" class="empty">Nessuna spesa.</td></tr>';
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
   let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;const splitEl=document.getElementById("split");if(splitEl)splitEl.textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
