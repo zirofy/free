@@ -59,30 +59,20 @@ if(!Array.isArray(d.expenses))d.expenses=[];
 if(!Array.isArray(d.goals))d.goals=[];
 if(!Array.isArray(d.splits))d.splits=[];
 if(!Array.isArray(d.installments))d.installments=[];
+d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
-const moneyCents=n=>Math.round((Number(n)||0)*100);
 const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
 function addMonthsClamped(dateStr,months){const src=new Date(dateStr+'T12:00:00');const day=src.getDate();const out=new Date(src.getFullYear(),src.getMonth()+months,1,12);const lastDay=new Date(out.getFullYear(),out.getMonth()+1,0,12).getDate();out.setDate(Math.min(day,lastDay));return localDateKey(out)}
-function monthKey(dateStr){return dateStr.slice(0,7)}
+function monthKey(dateStr){return (dateStr||'').slice(0,7)}
 function formatDate(dateStr){if(!dateStr)return '—';const p=dateStr.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
-function ensureInstallmentExpense(debt,pay){
-  const key=debt.id+'-'+pay.n;
-  const exists=d.expenses.some(x=>x.rateKey===key);
-  if(!exists && pay.due<=todayKey()){
-    d.expenses.push({x:debt.name+' · rata '+pay.n+'/'+debt.count,a:pay.amount,c:'Rate',rateKey:key,due:pay.due});
-    pay.recorded=true;
-  }else if(exists){pay.recorded=true}
-}
-function syncInstallments(){
-  d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>ensureInstallmentExpense(debt,pay)));
-}
+function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.round((b-a)/86400000)}
 function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
 function setIncome(){d.income=+document.getElementById('income').value||0;save()}
 function setBudget(){d.budget=+document.getElementById('budget').value||0;save()}
 function addExpense(){let x=document.getElementById('desc').value.trim(),a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value;if(!x||a<=0)return;d.expenses.push({x,a,c});document.getElementById('desc').value='';document.getElementById('amount').value='';save()}
-function del(i){d.expenses.splice(i,1);save()}
+function del(i){if(d.expenses[i]&&d.expenses[i].rateKey){alert('Questa spesa deriva da una rata. Per modificarla usa la sezione Rate.');return}d.expenses.splice(i,1);save()}
 function addGoal(){let n=document.getElementById('gn').value.trim(),f=document.getElementById('gf').value,t=+document.getElementById('gt').value||0,s=+document.getElementById('gs').value||0;if(!n||t<=0)return;d.goals.push({n,f,t,s});document.getElementById('gn').value='';document.getElementById('gt').value='';document.getElementById('gs').value='';save()}
 function updateGoal(i){let v=prompt('Quanto vuoi aggiungere al progresso?');let a=+v||0;if(a<=0)return;d.goals[i].s=Math.min(d.goals[i].t,d.goals[i].s+a);save()}
 function delGoal(i){if(confirm('Eliminare questo obiettivo?')){d.goals.splice(i,1);save()}}
@@ -90,75 +80,74 @@ function saveReview(){document.getElementById('saved').style.display='block'}
 function resetData(){if(confirm('Cancellare i dati salvati?')){localStorage.removeItem(KEY);location.reload()}}
 function saveEmergency(){d.emergency={target:+document.getElementById("em").value||0,months:+document.getElementById("emm").value||0};save()}
 function addInstallment(){
-  const name=document.getElementById('iDesc').value.trim();
-  const total=+document.getElementById('iTotal').value||0;
-  const count=+document.getElementById('iCount').value||3;
-  const first=document.getElementById('iDate').value||todayKey();
+  const name=document.getElementById('iDesc').value.trim(), total=+document.getElementById('iTotal').value||0, count=+document.getElementById('iCount').value||3, first=document.getElementById('iDate').value||todayKey();
   if(!name||total<=0||count<3||count>24||!first)return;
-  const totalCents=moneyCents(total);
-  const baseCents=Math.floor(totalCents/count);
-  const remainder=totalCents-baseCents*count;
-  const schedule=[];
-  for(let i=0;i<count;i++)schedule.push({n:i+1,due:addMonthsClamped(first,i),amount:(baseCents+(i===count-1?remainder:0))/100,recorded:false});
+  const totalCents=Math.round(total*100),baseCents=Math.floor(totalCents/count),remainder=totalCents-baseCents*count,schedule=[];
+  for(let i=0;i<count;i++)schedule.push({n:i+1,due:addMonthsClamped(first,i),amount:(baseCents+(i===count-1?remainder:0))/100,paid:false,paidAt:null});
   d.installments.push({id:'rate_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),name,total:totalCents/100,count,firstDate:first,schedule});
-  syncInstallments();
-  document.getElementById('iDesc').value='';document.getElementById('iTotal').value='';document.getElementById('iDate').value=todayKey();document.getElementById('iCount').value='3';
+  document.getElementById('iDesc').value='';document.getElementById('iTotal').value='';document.getElementById('iDate').value=todayKey();document.getElementById('iCount').value='3';save();
+}
+function getPay(debt,n){return (debt.schedule||[]).find(p=>p.n===n)}
+function payKey(debt,pay){return debt.id+'-'+pay.n}
+function markInstallmentPaid(debtId,n){
+  const debt=d.installments.find(x=>x.id===debtId),pay=debt&&getPay(debt,n);if(!pay||pay.paid)return;
+  pay.paid=true;pay.paidAt=todayKey();
+  if(!d.expenses.some(x=>x.rateKey===payKey(debt,pay)))d.expenses.push({x:debt.name+' · rata '+pay.n+'/'+debt.count,a:pay.amount,c:'Rate',rateKey:payKey(debt,pay),due:pay.due,paidAt:pay.paidAt});
   save();
+}
+function unpayInstallment(debtId,n){
+  const debt=d.installments.find(x=>x.id===debtId),pay=debt&&getPay(debt,n);if(!pay||!pay.paid)return;
+  if(!confirm('Segnare questa rata come non pagata? La spesa verrà rimossa dalla Dashboard.'))return;
+  pay.paid=false;pay.paidAt=null;d.expenses=d.expenses.filter(x=>x.rateKey!==payKey(debt,pay));save();
 }
 function delInstallment(id){
-  if(!confirm('Eliminare questo acquisto a rate e le relative rate dalla Dashboard?'))return;
-  d.expenses=d.expenses.filter(x=>x.rateKey&&!x.rateKey.startsWith(id+'-')?true:!x.rateKey);
-  d.installments=d.installments.filter(x=>x.id!==id);
-  save();
+  if(!confirm('Eliminare questo acquisto a rate? Verranno rimosse anche le rate già registrate tra le spese.'))return;
+  d.expenses=d.expenses.filter(x=>!x.rateKey||!x.rateKey.startsWith(id+'-'));
+  d.installments=d.installments.filter(x=>x.id!==id);save();
 }
 function initInstallmentForm(){
-  const s=document.getElementById('iCount');
-  if(s&&!s.options.length)for(let i=3;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i+(i===1?' rata':' rate');s.appendChild(o)}
+  const s=document.getElementById('iCount');if(s&&!s.options.length)for(let i=3;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i+' rate';s.appendChild(o)}
   const date=document.getElementById('iDate');if(date&&!date.value)date.value=todayKey();
 }
+function installmentStatus(pay){
+  if(pay.paid)return '<span class="pill green">Pagata</span>';
+  const days=daysFromToday(pay.due);
+  if(days<0)return '<span class="pill" style="color:#ffb3b3;background:#4a2626">Scaduta</span>';
+  if(days===0)return '<span class="pill" style="color:#111;background:var(--accent)">Oggi</span>';
+  return '<span class="pill">Tra '+days+' gg</span>';
+}
 function renderInstallments(){
-  initInstallmentForm();
-  const list=document.getElementById('installmentsList');if(!list)return;
+  initInstallmentForm();const list=document.getElementById('installmentsList');if(!list)return;
   if(!d.installments.length){list.innerHTML='<div class="card"><div class="empty">Nessun acquisto a rate registrato.</div></div>';return}
   list.innerHTML=d.installments.map(debt=>{
-    syncInstallments();
-    const recorded=(debt.schedule||[]).filter(p=>p.recorded).length;
-    const recordedAmount=(debt.schedule||[]).filter(p=>p.recorded).reduce((s,p)=>s+p.amount,0);
-    const remaining=Math.max(0,debt.total-recordedAmount);
-    const next=(debt.schedule||[]).find(p=>!p.recorded);
-    const pct=Math.min(100,recorded/debt.count*100);
-    return '<div class="card"><div class="row"><div><div class="label">Acquisto a rate</div><div class="value" style="font-size:22px">'+debt.name+'</div><div class="small" style="margin-top:5px">'+eur(debt.total)+' · '+debt.count+' rate · prima rata '+formatDate(debt.firstDate)+'</div></div><span class="pill '+(pct>=100?'green':'')+'">'+pct.toFixed(0)+'%</span></div>'+
+    const paid=(debt.schedule||[]).filter(p=>p.paid).length,paidAmount=(debt.schedule||[]).filter(p=>p.paid).reduce((s,p)=>s+p.amount,0),remaining=Math.max(0,debt.total-paidAmount),pct=Math.min(100,paid/debt.count*100);
+    const next=(debt.schedule||[]).find(p=>!p.paid);
+    const dueNow=(debt.schedule||[]).filter(p=>!p.paid&&p.due<=todayKey()).length;
+    return '<div class="card"><div class="row"><div><div class="label">Acquisto a rate</div><div class="value" style="font-size:22px">'+debt.name+'</div><div class="small" style="margin-top:5px">'+eur(debt.total)+' · '+debt.count+' rate · prima rata '+formatDate(debt.firstDate)+'</div></div><span class="pill '+(pct>=100?'green':'')+'">'+pct.toFixed(0)+'% pagato</span></div>'+
     '<div class="progress"><div class="bar" style="width:'+pct+'%"></div></div>'+
-    '<div class="row small"><span>Registrate: '+recorded+'/'+debt.count+'</span><span>Residuo: '+eur(remaining)+'</span></div>'+
-    '<div style="margin-top:15px;overflow:auto"><table><thead><tr><th>Rata</th><th>Scadenza</th><th>Importo</th><th>Stato</th></tr></thead><tbody>'+
-    debt.schedule.map(p=>'<tr><td>'+p.n+'/'+debt.count+'</td><td>'+formatDate(p.due)+'</td><td>'+eur(p.amount)+'</td><td><span class="pill '+(p.recorded?'green':'')+'">'+(p.recorded?'Registrata':'In programma')+'</span></td></tr>').join('')+
+    '<div class="row small"><span>Pagate: '+paid+'/'+debt.count+'</span><span>Residuo: '+eur(remaining)+'</span></div>'+
+    (dueNow?'<div class="notice" style="margin-top:13px"><strong>'+dueNow+' rata/e da verificare</strong><br><span class="small">Segna come pagate solo le rate che hai effettivamente saldato.</span></div>':'')+
+    '<div style="margin-top:15px;overflow:auto"><table><thead><tr><th>Rata</th><th>Scadenza</th><th>Importo</th><th>Stato</th><th></th></tr></thead><tbody>'+
+    debt.schedule.map(p=>'<tr><td>'+p.n+'/'+debt.count+'</td><td>'+formatDate(p.due)+'</td><td>'+eur(p.amount)+'</td><td>'+installmentStatus(p)+'</td><td>'+(!p.paid?'<button class="btn" onclick="markInstallmentPaid(\''+debt.id+'\','+p.n+')">Segna pagata</button>':'<button class="btn secondary" onclick="unpayInstallment(\''+debt.id+'\','+p.n+')">Annulla</button>')+'</td></tr>').join('')+
     '</tbody></table></div>'+
-    '<div class="row" style="margin-top:13px"><div class="small">'+(next?'Prossima rata: '+eur(next.amount)+' il '+formatDate(next.due):'Piano completato.')+'</div><button class="btn danger" onclick="delInstallment(''+debt.id+'')">Elimina</button></div></div>';
+    '<div class="row" style="margin-top:13px"><div class="small">'+(next?'Prossima rata: '+eur(next.amount)+' il '+formatDate(next.due):'Piano completato.')+'</div><button class="btn danger" onclick="delInstallment(\''+debt.id+'\')">Elimina</button></div></div>';
   }).join('');
 }
 function render(){
-  syncInstallments();
-  let total=d.expenses.reduce((s,x)=>s+x.a,0);
-  const rateExpenseTotal=d.expenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0);
-  let av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
-  document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate: '+eur(rateExpenseTotal);
+  let total=d.expenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=d.expenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
+  document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
   document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(d.budget);
-  const nextInstallment=d.installments.flatMap(x=>x.schedule||[]).filter(p=>!p.recorded).sort((a,b)=>a.due.localeCompare(b.due))[0];
-  const nextDebt=nextInstallment?d.installments.find(x=>(x.schedule||[]).some(p=>p===nextInstallment)):null;
-  document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':nextInstallment?'Prossima rata: '+eur(nextInstallment.amount)+' il '+formatDate(nextInstallment.due):!d.goals.length?'Crea il tuo primo obiettivo.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
+  const allFuture=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.paid).sort((a,b)=>a.due.localeCompare(b.due));
+  const due=allFuture.find(x=>x.due<=todayKey()),nextRate=allFuture[0];
+  document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':due?'Hai una rata da verificare: '+eur(due.amount):nextRate?'Prossima rata: '+eur(nextRate.amount)+' il '+formatDate(nextRate.due):!d.goals.length?'Crea il tuo primo obiettivo.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
   document.getElementById('table').innerHTML=d.expenses.length?d.expenses.map((x,i)=>'<tr><td>'+x.x+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>').join(''):'<tr><td colspan="4" class="empty">Nessuna spesa.</td></tr>';
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
   let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;const splitEl=document.getElementById("split");if(splitEl)splitEl.textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
   const emtxt=document.getElementById('emtxt');if(emtxt){const e=d.emergency||{};emtxt.textContent=e.target?'Obiettivo: '+eur(e.target)+(e.months?' · '+e.months+' mesi di spese':''):'Nessun obiettivo di emergenza impostato.';}
-  const month=monthKey(todayKey());
-  const monthRate=d.expenses.filter(x=>x.rateKey&&monthKey(x.due||'')===month).reduce((s,x)=>s+x.a,0);
-  const nextRate=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.recorded).sort((a,b)=>a.due.localeCompare(b.due))[0];
-  document.getElementById('instMonth').textContent=eur(monthRate);
-  document.getElementById('instMonthText').textContent=monthRate?'Registrate e incluse nelle spese del mese.':'Nessun pagamento rateale registrato questo mese.';
-  document.getElementById('instNext').textContent=nextRate?eur(nextRate.amount):'—';
-  document.getElementById('instNextText').textContent=nextRate?nextRate.debt.name+' · rata '+nextRate.n+'/'+nextRate.debt.count+' · '+formatDate(nextRate.due):'Nessuna rata futura.';
+  const month=monthKey(todayKey()),monthRate=d.expenses.filter(x=>x.rateKey&&monthKey(x.due||'')===month).reduce((s,x)=>s+x.a,0),nextRate=allFuture[0];
+  document.getElementById('instMonth').textContent=eur(monthRate);document.getElementById('instMonthText').textContent=monthRate?'Rate pagate e incluse nelle spese del mese.':'Nessuna rata pagata questo mese.';
+  document.getElementById('instNext').textContent=nextRate?eur(nextRate.amount):'—';document.getElementById('instNextText').textContent=nextRate?nextRate.debt.name+' · rata '+nextRate.n+'/'+nextRate.debt.count+' · '+formatDate(nextRate.due):'Nessuna rata futura.';
   renderInstallments();
 }
-initInstallmentForm();
-render();
+initInstallmentForm();render();
 </script></body></html>
