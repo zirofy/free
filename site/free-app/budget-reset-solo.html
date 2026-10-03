@@ -60,11 +60,28 @@ if(!Array.isArray(d.goals))d.goals=[];
 if(!Array.isArray(d.splits))d.splits=[];
 if(!Array.isArray(d.installments))d.installments=[];
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
+repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
 const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
 function addMonthsClamped(dateStr,months){const base=new Date(dateStr+'T12:00:00');const out=new Date(base.getTime());out.setDate(out.getDate()+(30*months));return localDateKey(out)}
+function repairInstallmentSchedules(){
+  let changed=false;
+  d.installments.forEach(debt=>{
+    if(!debt.firstDate||!Array.isArray(debt.schedule))return;
+    debt.schedule.forEach(pay=>{
+      const expectedDue=addMonthsClamped(debt.firstDate,(Number(pay.n)||1)-1);
+      if(pay.due!==expectedDue){pay.due=expectedDue;changed=true}
+      if(pay.paid){
+        const key=debt.id+'-'+pay.n;
+        const expense=d.expenses.find(x=>x.rateKey===key);
+        if(expense&&expense.due!==expectedDue){expense.due=expectedDue;changed=true}
+      }
+    });
+  });
+  if(changed)localStorage.setItem(KEY,JSON.stringify(d));
+}
 function monthKey(dateStr){return (dateStr||'').slice(0,7)}
 function formatDate(dateStr){if(!dateStr)return '—';const p=dateStr.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.max(-9999,Math.round((b-a)/86400000))}
