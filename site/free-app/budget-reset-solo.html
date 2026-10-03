@@ -28,7 +28,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrate</div><input id="income" type="number" step=".01" placeholder="2000"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva</button></div>
 <div class="card"><div class="label">Budget</div><input id="budget" type="number" step=".01" placeholder="1500"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva</button></div>
 <div class="card"><div class="label">Principio</div><div class="small" style="margin-top:8px">Misura ciò che accade davvero. Poi fai una piccola correzione.</div></div></div>
-<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Rate pagate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div><div id="instCountdownCard" class="card"><div class="label">Countdown</div><div id="instCountdown" class="value accent">—</div><div id="instCountdownText" class="small">Nessuna scadenza imminente.</div></div></div></section>
+<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Rate pagate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div><div id="instCountdownCard" class="card"><div class="label">Countdown prossima rata</div><div id="instCountdown" class="value accent">—</div><div id="instCountdownText" class="small">Nessuna scadenza imminente.</div></div></div></section>
 
 <section id="expenses" class="view"><header><div><h1>Spese</h1><div class="sub">Registrale in pochi secondi.</div></div></header><div class="card"><div class="formgrid">
 <input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div></div>
@@ -44,9 +44,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 
 
 <section id="installments" class="view"><header><div><h1>Rate</h1><div class="sub">Tieni sotto controllo gli acquisti pagati a rate. La prima rata parte dalla data indicata; le successive vengono generate automaticamente ogni mese.</div></div></header>
-<div class="card"><div class="notice"><strong>Come funziona</strong><br><span class="small">Inserisci il debito totale, il numero di rate e la data della prima rata. Budget Reset registra automaticamente ogni rata nella Dashboard quando arriva la sua data.</span></div>
+<div class="card"><div class="notice"><strong>Come funziona</strong><br><span class="small">Inserisci il debito totale, il numero di rate e la data della prima rata. Budget Reset calcola le scadenze successive ogni 30 giorni e le mostra nella Dashboard. La rata entra nelle spese solo quando la segni come pagata.</span></div>
 <div class="formgrid" style="margin-top:15px"><input id="iDesc" placeholder="es. Smartphone"><input id="iTotal" type="number" step=".01" min="0" placeholder="Importo totale €"><select id="iCount"></select><input id="iDate" type="date"><button class="btn" onclick="addInstallment()">+ Aggiungi acquisto a rate</button></div>
-<div class="small" style="margin-top:10px">Esempio: €600 in 3 rate con prima scadenza il 02/10 → €200 il 02/10, €200 il 02/11 e €200 il 02/12. Le scadenze restano sullo stesso giorno del mese.</div></div>
+<div class="small" style="margin-top:10px">Esempio: acquisto il 03/10 → €200 il 03/10, €200 dopo 30 giorni (02/11) e €200 dopo altri 30 giorni (02/12).</div></div>
 <div id="installmentsList" class="grid" style="margin-top:15px"></div></section>
 
 <section id="review" class="view"><header><div><h1>Review settimanale</h1><div class="sub">5 minuti per decidere la prossima settimana.</div></div></header>
@@ -64,7 +64,7 @@ const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).fo
 const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
-function addMonthsClamped(dateStr,months){const src=new Date(dateStr+'T12:00:00');const day=src.getDate();const out=new Date(src.getFullYear(),src.getMonth()+months,1,12);const lastDay=new Date(out.getFullYear(),out.getMonth()+1,0,12).getDate();out.setDate(Math.min(day,lastDay));return localDateKey(out)}
+function addMonthsClamped(dateStr,months){const base=new Date(dateStr+'T12:00:00');const out=new Date(base.getTime());out.setDate(out.getDate()+(30*months));return localDateKey(out)}
 function monthKey(dateStr){return (dateStr||'').slice(0,7)}
 function formatDate(dateStr){if(!dateStr)return '—';const p=dateStr.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.max(-9999,Math.round((b-a)/86400000))}
@@ -165,7 +165,7 @@ function render(){
   const emtxt=document.getElementById('emtxt');if(emtxt){const e=d.emergency||{};emtxt.textContent=e.target?'Obiettivo: '+eur(e.target)+(e.months?' · '+e.months+' mesi di spese':''):'Nessun obiettivo di emergenza impostato.';}
   const month=monthKey(todayKey()),monthRate=d.expenses.filter(x=>x.rateKey&&monthKey(x.due||'')===month).reduce((s,x)=>s+x.a,0),dashboardNextRate=allFuture[0];
   document.getElementById('instMonth').textContent=eur(monthRate);document.getElementById('instMonthText').textContent=monthRate?'Rate pagate e incluse nelle spese del mese.':'Nessuna rata pagata questo mese.';
-  document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due):'Nessuna rata futura.';
+  document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due)+' · intervallo 30 giorni':'Nessuna rata futura.';
   renderInstallments();
 }
 initInstallmentForm();render();
