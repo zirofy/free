@@ -31,8 +31,11 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Rate pagate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div><div id="instCountdownCard" class="card"><div class="label">Countdown prossima rata</div><div id="instCountdown" class="value accent">—</div><div id="instCountdownText" class="small">Nessuna scadenza imminente.</div></div></div></section>
 
 <section id="expenses" class="view"><header><div><h1>Spese</h1><div class="sub">Registrale in pochi secondi.</div></div></header><div class="card"><div class="formgrid">
-<input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div></div>
-<div class="card" style="margin-top:15px"><table><thead><tr><th>Descrizione</th><th>Categoria</th><th>Importo</th><th></th></tr></thead><tbody id="table"></tbody></table></div></section>
+<input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><input id="expenseDate" type="date"><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div>
+<label style="display:flex;align-items:center;gap:10px;margin-top:14px;cursor:pointer"><input id="repeatMonthly" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">Il prossimo mese questa stessa spesa verrà inserita automaticamente nello stesso giorno.</span></span></label></div>
+<div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Mese corrente</div><div id="expenseMonthTitle" class="value" style="font-size:21px">—</div></div><span id="expenseMonthTotal" class="pill green">€0</span></div>
+<table style="margin-top:12px"><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th></th></tr></thead><tbody id="table"></tbody></table></div>
+<div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Spese ricorrenti</div><div class="small">Queste voci vengono riproposte ogni mese, ma incidono sul totale solo nel mese di competenza.</div></div><span id="recurringCount" class="pill">0</span></div><div id="recurringList" style="margin-top:12px"></div></div></section>
 
 <section id="goals" class="view"><header><div><h1>Obiettivi</h1><div class="sub">Imposta un obiettivo semplice: giornaliero, settimanale o mensile.</div></div></header>
 <div class="card"><div class="formgrid"><input id="gn" placeholder="es. Mettere da parte per vacanza"><select id="gf"><option value="giornaliero">Giornaliero</option><option value="settimanale" selected>Settimanale</option><option value="mensile">Mensile</option></select><input id="gt" type="number" step=".01" min="0" placeholder="Obiettivo €"><input id="gs" type="number" step=".01" min="0" placeholder="Già fatto €"><button class="btn" onclick="addGoal()">+ Crea obiettivo</button></div><div class="small" style="margin-top:10px">Esempi: “Mettere da parte 10 € al giorno”, “Risparmiare 50 € questa settimana”, “Accantonare 200 € questo mese”.</div></div>
@@ -54,17 +57,47 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 </main></div>
 <script>
 const KEY="budget_reset_solo";
-let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[]}');
+let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[],"recurringExpenses":[]}');
 if(!Array.isArray(d.expenses))d.expenses=[];
 if(!Array.isArray(d.goals))d.goals=[];
 if(!Array.isArray(d.splits))d.splits=[];
 if(!Array.isArray(d.installments))d.installments=[];
+if(!Array.isArray(d.recurringExpenses))d.recurringExpenses=[];
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
 const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
+function monthLabel(month){const [y,m]=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(y),Number(m)-1,1))}
+function dateForMonth(month,day){const [y,m]=month.split('-').map(Number);const last=new Date(y,m,0).getDate();return y+'-'+String(m).padStart(2,'0')+'-'+String(Math.min(day,last)).padStart(2,'0')}
+function currentMonthExpenses(){const m=monthKey(todayKey());return d.expenses.filter(x=>monthKey(x.date||x.due||todayKey())===m)}
+function recurringMonthKey(id,month){return 'rec_'+id+'_'+month}
+function syncRecurringExpenses(){
+  let changed=false;
+  const currentMonth=monthKey(todayKey());
+  d.expenses.forEach(x=>{if(!x.date)x.date=x.due||todayKey()});
+  d.recurringExpenses.forEach(r=>{
+    if(r.active===false||!r.startDate)return;
+    const startMonth=monthKey(r.startDate);
+    if(startMonth>currentMonth)return;
+    const [sy,sm]=startMonth.split('-').map(Number),[cy,cm]=currentMonth.split('-').map(Number);
+    const months=(cy-sy)*12+(cm-sm);
+    for(let i=0;i<=months;i++){
+      const y=sm-1+i,year=sy+Math.floor(y/12),month=((y%12)+12)%12+1,monthKeyValue=year+'-'+String(month).padStart(2,'0');
+      const due=dateForMonth(monthKeyValue,r.day);
+      if(due>todayKey()&&monthKeyValue===currentMonth)continue;
+      const key=recurringMonthKey(r.id,monthKeyValue);
+      if(!d.expenses.some(x=>x.recurringKey===key)){
+        d.expenses.push({x:r.name,a:r.amount,c:r.category,date:due,recurringKey:key,recurringId:r.id});
+        changed=true;
+      }
+    }
+  });
+  if(changed)localStorage.setItem(KEY,JSON.stringify(d));
+  return changed;
+}
+
 function addMonthsClamped(dateStr,months){const base=new Date(dateStr+'T12:00:00');const out=new Date(base.getTime());out.setDate(out.getDate()+(30*months));return localDateKey(out)}
 function repairInstallmentSchedules(){
   let changed=false;
@@ -97,8 +130,21 @@ function countdownClass(days){
 function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
 function setIncome(){d.income=+document.getElementById('income').value||0;save()}
 function setBudget(){d.budget=+document.getElementById('budget').value||0;save()}
-function addExpense(){let x=document.getElementById('desc').value.trim(),a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value;if(!x||a<=0)return;d.expenses.push({x,a,c});document.getElementById('desc').value='';document.getElementById('amount').value='';save()}
-function del(i){if(d.expenses[i]&&d.expenses[i].rateKey){alert('Questa spesa deriva da una rata. Per modificarla usa la sezione Rate.');return}d.expenses.splice(i,1);save()}
+function addExpense(){
+  const x=document.getElementById('desc').value.trim(),a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value,date=document.getElementById('expenseDate').value||todayKey(),repeat=document.getElementById('repeatMonthly').checked;
+  if(!x||a<=0)return;
+  if(repeat){
+    const id='rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    const day=Number(date.slice(8,10));
+    const r={id,name:x,amount:a,category:c,startDate:date,day,active:true};
+    d.recurringExpenses.push(r);
+    d.expenses.push({x,a,c,date,recurringKey:recurringMonthKey(id,monthKey(date)),recurringId:id});
+  }else{
+    d.expenses.push({x,a,c,date});
+  }
+  document.getElementById('desc').value='';document.getElementById('amount').value='';document.getElementById('expenseDate').value=todayKey();document.getElementById('repeatMonthly').checked=false;save()
+}
+function del(i){if(d.expenses[i]&&d.expenses[i].rateKey){alert('Questa spesa deriva da una rata. Per modificarla usa la sezione Rate.');return}if(d.expenses[i]&&d.expenses[i].recurringKey){alert('Questa è una spesa ricorrente. Usa "Ferma" nella sezione Spese ricorrenti per interromperla.');return}d.expenses.splice(i,1);save()}
 function addGoal(){let n=document.getElementById('gn').value.trim(),f=document.getElementById('gf').value,t=+document.getElementById('gt').value||0,s=+document.getElementById('gs').value||0;if(!n||t<=0)return;d.goals.push({n,f,t,s});document.getElementById('gn').value='';document.getElementById('gt').value='';document.getElementById('gs').value='';save()}
 function updateGoal(i){let v=prompt('Quanto vuoi aggiungere al progresso?');let a=+v||0;if(a<=0)return;d.goals[i].s=Math.min(d.goals[i].t,d.goals[i].s+a);save()}
 function delGoal(i){if(confirm('Eliminare questo obiettivo?')){d.goals.splice(i,1);save()}}
@@ -131,6 +177,14 @@ function delInstallment(id){
   d.expenses=d.expenses.filter(x=>!x.rateKey||!x.rateKey.startsWith(id+'-'));
   d.installments=d.installments.filter(x=>x.id!==id);save();
 }
+function initExpenseForm(){const date=document.getElementById('expenseDate');if(date&&!date.value)date.value=todayKey()}
+function stopRecurring(id){const r=d.recurringExpenses.find(x=>x.id===id);if(!r)return;if(!confirm('Smettere di ripetere questa spesa dal prossimo mese?'))return;r.active=false;save()}
+function renderRecurring(){
+  const list=document.getElementById('recurringList');if(!list)return;
+  document.getElementById('recurringCount').textContent=d.recurringExpenses.filter(r=>r.active!==false).length;
+  const active=d.recurringExpenses.filter(r=>r.active!==false);
+  list.innerHTML=active.length?active.map(r=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div><strong>'+r.name+'</strong><div class="small">'+eur(r.amount)+' · ogni mese · giorno '+String(r.day).padStart(2,'0')+'</div></div><button class="btn danger" onclick="stopRecurring(\''+r.id+'\')">Ferma</button></div>').join(''):'<div class="empty">Nessuna spesa ricorrente attiva.</div>';
+}
 function initInstallmentForm(){
   const s=document.getElementById('iCount');if(s&&!s.options.length)for(let i=3;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i+' rate';s.appendChild(o)}
   const date=document.getElementById('iDate');if(date&&!date.value)date.value=todayKey();
@@ -161,7 +215,9 @@ function renderInstallments(){
   }).join('');
 }
 function render(){
-  let total=d.expenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=d.expenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
+  syncRecurringExpenses();
+  const monthExpenses=currentMonthExpenses();
+  let total=monthExpenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=monthExpenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
   document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
   document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(d.budget);
   const allFuture=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.paid).sort((a,b)=>a.due.localeCompare(b.due));
@@ -176,7 +232,11 @@ function render(){
   }else{
     countdown.textContent='—';countdownTextEl.textContent='Nessuna scadenza futura.';countdownCard.className='card';countdownCard.style.borderLeft='';
   }
-  document.getElementById('table').innerHTML=d.expenses.length?d.expenses.map((x,i)=>'<tr><td>'+x.x+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>').join(''):'<tr><td colspan="4" class="empty">Nessuna spesa.</td></tr>';
+  const currentMonthKey=monthKey(todayKey());
+  document.getElementById('expenseMonthTitle').textContent=monthLabel(currentMonthKey);
+  document.getElementById('expenseMonthTotal').textContent=eur(total);
+  document.getElementById('table').innerHTML=monthExpenses.length?monthExpenses.map(x=>{const i=d.expenses.indexOf(x);return '<tr><td>'+formatDate(x.date||x.due)+'</td><td>'+x.x+(x.recurringKey?' <span class="pill">Ogni mese</span>':'')+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>'}).join(''):'<tr><td colspan="5" class="empty">Nessuna spesa nel mese corrente.</td></tr>';
+  renderRecurring();
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
   let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;const splitEl=document.getElementById("split");if(splitEl)splitEl.textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
   const emtxt=document.getElementById('emtxt');if(emtxt){const e=d.emergency||{};emtxt.textContent=e.target?'Obiettivo: '+eur(e.target)+(e.months?' · '+e.months+' mesi di spese':''):'Nessun obiettivo di emergenza impostato.';}
@@ -185,5 +245,5 @@ function render(){
   document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due)+' · intervallo 30 giorni':'Nessuna rata futura.';
   renderInstallments();
 }
-initInstallmentForm();render();
+initExpenseForm();initInstallmentForm();render();
 </script></body></html>
