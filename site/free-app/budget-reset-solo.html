@@ -118,6 +118,25 @@ function repairInstallmentSchedules(){
   if(changed)localStorage.setItem(KEY,JSON.stringify(d));
 }
 function monthKey(dateStr){return (dateStr||'').slice(0,7)}
+function yearKey(dateStr){return (dateStr||'').slice(0,4)}
+function currentYear(){return String(new Date().getFullYear())}
+function renderAnnualSummary(){
+  const year=currentYear();
+  const active=d.recurringExpenses.filter(r=>r.active!==false);
+  const annualTotal=active.reduce((sum,r)=>sum+(Number(r.amount)||0)*12,0);
+  const annualFixedTotal=document.getElementById('annualFixedTotal');
+  const annualYear=document.getElementById('annualYear');
+  const annualRecurringList=document.getElementById('annualRecurringList');
+  const annualSpentTotal=document.getElementById('annualSpentTotal');
+  const annualSpentText=document.getElementById('annualSpentText');
+  if(!annualFixedTotal||!annualYear||!annualRecurringList||!annualSpentTotal||!annualSpentText)return;
+  annualFixedTotal.textContent=eur(annualTotal);
+  annualYear.textContent=year;
+  annualRecurringList.innerHTML=active.length?active.map(r=>'<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><div><strong>'+r.name+'</strong><div class="small">'+eur(r.amount)+' al mese × 12</div></div><strong>'+eur((Number(r.amount)||0)*12)+'</strong></div>').join(''):'<div class="empty">Nessuna spesa ricorrente attiva.</div>';
+  const annualSpent=d.expenses.filter(x=>yearKey(x.date||x.due||'')===year).reduce((sum,x)=>sum+(Number(x.a)||0),0);
+  annualSpentTotal.textContent=eur(annualSpent);
+  annualSpentText.textContent='Spese effettivamente registrate dal 1° gennaio al 31 dicembre '+year+'.';
+}
 function formatDate(dateStr){if(!dateStr)return '—';const p=dateStr.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function daysFromToday(dateStr){const a=new Date(todayKey()+'T12:00:00'),b=new Date(dateStr+'T12:00:00');return Math.max(-9999,Math.round((b-a)/86400000))}
 function countdownText(days){
@@ -239,6 +258,7 @@ function render(){
   document.getElementById('expenseMonthTotal').textContent=eur(total);
   document.getElementById('table').innerHTML=monthExpenses.length?monthExpenses.map(x=>{const i=d.expenses.indexOf(x);return '<tr><td>'+formatDate(x.date||x.due)+'</td><td>'+x.x+(x.recurringKey?' <span class="pill">Ogni mese</span>':'')+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>'}).join(''):'<tr><td colspan="5" class="empty">Nessuna spesa nel mese corrente.</td></tr>';
   renderRecurring();
+  renderAnnualSummary();
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
   let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;const splitEl=document.getElementById("split");if(splitEl)splitEl.textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
   const emtxt=document.getElementById('emtxt');if(emtxt){const e=d.emergency||{};emtxt.textContent=e.target?'Obiettivo: '+eur(e.target)+(e.months?' · '+e.months+' mesi di spese':''):'Nessun obiettivo di emergenza impostato.';}
