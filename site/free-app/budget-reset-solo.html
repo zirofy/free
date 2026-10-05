@@ -15,13 +15,13 @@ button.btn{background:var(--accent);color:#111;border:0;border-radius:9px;paddin
 .progress{height:10px;background:#333;border-radius:999px;overflow:hidden;margin:13px 0}.bar{height:100%;background:var(--accent);border-radius:999px}
 .view{display:none}.view.active{display:block}.pill{padding:4px 8px;border-radius:999px;background:#333;color:#bbb;font-size:12px}.pill.green{color:var(--accent);background:#303b14}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px;border-bottom:1px solid var(--line);font-size:14px}th{font-size:11px;color:#aaa;text-transform:uppercase}.empty{text-align:center;color:#777;padding:25px}
-.notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}
+.notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}
 @media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
 </style></head><body><div class="app">
 <aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
 <nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
 <main class="main">
-<section id="dash" class="view active"><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><button class="btn secondary" onclick="resetData()">Reset</button></header>
+<section id="dash" class="view active"><div class="card cloud-card"><div class="cloud-status"><div><div class="label">I TUOI DATI</div><div id="cloudText"><span class="cloud-dot"></span>Solo su questo dispositivo</div></div><div class="cloud-actions"><button class="btn" onclick="openAuth()">Salva nel cloud</button></div></div></div><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><button class="btn secondary" onclick="resetData()">Reset</button></header>
 <div class="grid kpis"><div class="card"><div class="label">Entrate</div><div id="inc" class="value">€0</div></div><div class="card"><div class="label">Spese</div><div id="exp" class="value">€0</div><div id="expRate" class="small" style="margin-top:5px">Incluse rate: €0</div></div><div class="card"><div class="label">Disponibile</div><div id="avail" class="value accent">€0</div></div><div class="card"><div class="label">Risparmio</div><div id="rate" class="value">0%</div></div></div>
 <div class="grid two" style="margin-top:15px"><div class="card"><div class="row"><div><div class="label">Budget mensile</div><h2>Quanto puoi ancora spendere?</h2></div><span id="bp" class="pill green">0%</span></div><div class="progress"><div id="bb" class="bar" style="width:0%"></div></div><div class="row small"><span id="st">€0 spesi</span><span id="bt">Budget €0</span></div></div>
 <div class="card"><div class="label">Prossima azione</div><h2 id="next">Inserisci l'entrata.</h2><div class="small">Una decisione alla volta.</div></div></div>
@@ -68,7 +68,7 @@ if(!Array.isArray(d.recurringExpenses))d.recurringExpenses=[];
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
-const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render()};
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render();if(window.BRCloud?.isOnline())window.BRCloud.save(d).catch(err=>console.warn("Cloud save:",err))};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
 function monthLabel(month){const [y,m]=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(y),Number(m)-1,1))}
@@ -298,4 +298,27 @@ function render(){
   renderInstallments();
 }
 initExpenseForm();initInstallmentForm();repairClosedInstallments();render();
+</script><div id="authModal" class="modal-backdrop" onclick="if(event.target===this)closeAuth()"><div class="modal"><div class="row"><h2 id="authTitle">Salva i tuoi dati</h2><button class="btn secondary" onclick="closeAuth()">Chiudi</button></div><div class="small" style="margin-bottom:15px">Crea un account gratuito per usare Budget Reset su più dispositivi.</div><div class="grid"><input id="authEmail" type="email" placeholder="La tua email"><input id="authPassword" type="password" placeholder="Password (min. 6 caratteri)"><div class="cloud-actions"><button class="btn" onclick="cloudCreate()">Crea account</button><button class="btn secondary" onclick="cloudLogin()">Accedi</button><button class="btn secondary" onclick="cloudResetPassword()">Password dimenticata</button></div><div id="authMsg" class="small"></div></div></div></div><script type="module">
+import "./firebase-cloud.js";
+window.addEventListener("brcloud:status",e=>{
+  const el=document.getElementById("cloudText"); if(!el)return;
+  const u=e.detail.user;
+  el.innerHTML=u?'<span class="cloud-dot on"></span>'+u.email:'<span class="cloud-dot"></span>Solo su questo dispositivo';
+  if(u) document.querySelector(".cloud-card .btn").textContent="Account attivo";
+});
+window.addEventListener("brcloud:loaded",e=>{
+  const data=e.detail.data;if(!data)return;
+  try{localStorage.setItem("budget_reset_solo",JSON.stringify(data));location.reload()}catch{}
+});
+window.addEventListener("brcloud:local-found",()=>{
+  const msg=confirm("Abbiamo trovato dati Budget Reset salvati su questo dispositivo. Vuoi salvarli nel tuo account cloud?");
+  if(msg&&window.BRCloud)window.BRCloud.migrateLocal().catch(err=>alert(err.message));
+});
+window.addEventListener("brcloud:error",e=>console.warn("Budget Reset Cloud:",e.detail.message));
+function openAuth(){document.getElementById("authModal").classList.add("show")}
+function closeAuth(){document.getElementById("authModal").classList.remove("show")}
+async function cloudCreate(){try{const e=document.getElementById("authEmail").value.trim(),p=document.getElementById("authPassword").value;if(!e||p.length<6)throw new Error("Inserisci email e una password di almeno 6 caratteri.");await BRCloud.signUp(e,p);closeAuth()}catch(err){document.getElementById("authMsg").textContent=err.message}}
+async function cloudLogin(){try{const e=document.getElementById("authEmail").value.trim(),p=document.getElementById("authPassword").value;await BRCloud.signIn(e,p);closeAuth()}catch(err){document.getElementById("authMsg").textContent=err.message}}
+async function cloudResetPassword(){try{const e=document.getElementById("authEmail").value.trim();if(!e)throw new Error("Inserisci prima la tua email.");await BRCloud.resetPassword(e);document.getElementById("authMsg").textContent="Email per reimpostare la password inviata."}catch(err){document.getElementById("authMsg").textContent=err.message}}
+window.openAuth=openAuth;window.closeAuth=closeAuth;window.cloudCreate=cloudCreate;window.cloudLogin=cloudLogin;window.cloudResetPassword=cloudResetPassword;
 </script></body></html>
