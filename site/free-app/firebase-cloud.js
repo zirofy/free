@@ -9,24 +9,28 @@ let auth=null;
 let db=null;
 let unsubscribe=null;
 let currentUser=null;
+let readyResolve=null;
+const ready=new Promise(resolve=>{readyResolve=resolve});
 
-function hasUsefulLocalData(){
-  try{
-    const raw=localStorage.getItem(localKey);
-    if(!raw)return false;
-    const data=JSON.parse(raw);
-    return Number(data.income||0)>0 ||
-      Number(data.budget||0)>0 ||
-      (Array.isArray(data.expenses)&&data.expenses.length>0) ||
-      (Array.isArray(data.goals)&&data.goals.length>0) ||
-      (Array.isArray(data.installments)&&data.installments.length>0) ||
-      (Array.isArray(data.recurringExpenses)&&data.recurringExpenses.length>0);
-  }catch{return false}
+function readLocal(){
+  try{return JSON.parse(localStorage.getItem(localKey)||"{}")}catch{return {}}
+}
+function hasUsefulData(data=readLocal()){
+  return Number(data.income||0)>0 ||
+    Number(data.budget||0)>0 ||
+    (Array.isArray(data.expenses)&&data.expenses.length>0) ||
+    (Array.isArray(data.goals)&&data.goals.length>0) ||
+    (Array.isArray(data.installments)&&data.installments.length>0) ||
+    (Array.isArray(data.recurringExpenses)&&data.recurringExpenses.length>0);
+}
+function sameData(a,b){
+  try{return JSON.stringify(a)===JSON.stringify(b)}catch{return false}
 }
 
 async function startCloud(){
   if(!firebaseConfigured){
     dispatch("brcloud:status",{configured:false,user:null,message:"Firebase non configurato"});
+    readyResolve();
     return;
   }
 
@@ -35,9 +39,7 @@ async function startCloud(){
     auth=getAuth(app);
 
     try{
-      db=initializeFirestore(app,{
-        localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})
-      });
+      db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
     }catch{
       db=initializeFirestore(app,{localCache:memoryLocalCache()});
     }
@@ -51,45 +53,65 @@ async function startCloud(){
       });
 
       if(unsubscribe){unsubscribe();unsubscribe=null}
-      if(!user)return;
+      if(!user){readyResolve();return}
 
-      const ref=doc(db,"users",user.uid);
-      const snap=await getDoc(ref);
+      try{
+        const ref=doc(db,"users",user.uid);
+        const snap=await getDoc(ref);
+        const local=readLocal();
 
-      if(!snap.exists()){
-        if(hasUsefulLocalData())dispatch("brcloud:local-found",{user:{uid:user.uid,email:user.email}});
-        return;
-      }
-
-      const cloudData=snap.data()?.budgetData;
-      if(cloudData){
-        localStorage.setItem(localKey,JSON.stringify(cloudData));
-        dispatch("brcloud:loaded",{data:cloudData,source:"cloud"});
-      }
-
-      unsubscribe=onSnapshot(ref,snapshot=>{
-        if(!snapshot.exists())return;
-        const data=snapshot.data()?.budgetData;
-        if(!data)return;
-        localStorage.setItem(localKey,JSON.stringify(data));
-        if(!snapshot.metadata.hasPendingWrites){
-          dispatch("brcloud:loaded",{data,source:"cloud"});
+        if(!snap.exists()){
+          if(hasUsefulData(local)){
+            await setDoc(ref,{budgetData:local,updatedAt:serverTimestamp(),email:user.email||null},{merge:true});
+            dispatch("brcloud:sync",{direction:"upload",source:"local",data:local});
+          }
+        }else{
+          const cloudData=snap.data()?.budgetData||null;
+          if(cloudData&&hasUsefulData(cloudData)){
+            if(!sameData(local,cloudData)){
+              // Notify first; the page handler writes the new data and reloads once.
+              dispatch("brcloud:loaded",{data:cloudData,source:"cloud"});
+            }else{
+              dispatch("brcloud:sync",{direction:"download",source:"cloud",data:cloudData});
+            }
+          }else if(hasUsefulData(local)){
+            await setDoc(ref,{budgetData:local,updatedAt:serverTimestamp(),email:user.email||null},{merge:true});
+            dispatch("brcloud:sync",{direction:"upload",source:"local",data:local});
+          }
         }
-      });
+
+        unsubscribe=onSnapshot(ref,snapshot=>{
+          if(!snapshot.exists())return;
+          const data=snapshot.data()?.budgetData;
+          if(!data)return;
+          const localNow=readLocal();
+          if(snapshot.metadata.hasPendingWrites)return;
+          if(!sameData(localNow,data)){
+            dispatch("brcloud:loaded",{data,source:"cloud"});
+          }
+        });
+      }catch(error){
+        dispatch("brcloud:error",{message:error?.message||"Errore nella sincronizzazione Firebase"});
+      }finally{
+        readyResolve();
+      }
     });
   }catch(error){
     dispatch("brcloud:error",{message:error?.message||"Impossibile inizializzare Firebase"});
+    readyResolve();
   }
 }
 
 async function save(data){
   localStorage.setItem(localKey,JSON.stringify(data));
+  await ready;
   if(!db||!currentUser)return {cloud:false};
   await setDoc(doc(db,"users",currentUser.uid),{
     budgetData:data,
     updatedAt:serverTimestamp(),
     email:currentUser.email||null
   },{merge:true});
+  dispatch("brcloud:sync",{direction:"upload",source:"save",data});
   return {cloud:true};
 }
 
@@ -105,21 +127,21 @@ async function resetPassword(email){
   if(!auth)throw new Error("Firebase non è ancora configurato.");
   return sendPasswordResetEmail(auth,email);
 }
-async function logout(){
-  if(auth)await signOut(auth);
-}
+async function logout(){if(auth)await signOut(auth)}
 async function migrateLocal(){
-  const raw=localStorage.getItem(localKey);
-  if(!raw)throw new Error("Non ci sono dati locali da importare.");
+  const data=readLocal();
+  await ready;
+  if(!data||!hasUsefulData(data))throw new Error("Non ci sono dati locali da importare.");
   if(!currentUser||!db)throw new Error("Accedi prima al tuo account.");
-  const data=JSON.parse(raw);
-  await setDoc(doc(db,"users",currentUser.uid),{
-    budgetData:data,
-    updatedAt:serverTimestamp(),
-    email:currentUser.email||null
-  },{merge:true});
-  dispatch("brcloud:loaded",{data,source:"migration"});
+  await setDoc(doc(db,"users",currentUser.uid),{budgetData:data,updatedAt:serverTimestamp(),email:currentUser.email||null},{merge:true});
+  dispatch("brcloud:sync",{direction:"upload",source:"migration",data});
 }
 
-window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,resetPassword,logout,migrateLocal,save,getUser:()=>currentUser};
+window.BRCloud={
+  configured:firebaseConfigured,
+  isOnline:()=>!!currentUser,
+  signUp,signIn,resetPassword,logout,migrateLocal,save,
+  getUser:()=>currentUser,
+  whenReady:()=>ready
+};
 startCloud();
