@@ -68,7 +68,7 @@ if(!Array.isArray(d.recurringExpenses))d.recurringExpenses=[];
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
-const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render();if(window.BRCloud?.isOnline())window.BRCloud.save(d).catch(err=>console.warn("Cloud save:",err))};
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render();if(window.BRCloud?.configured)window.BRCloud.save(d).catch(err=>{console.warn("Cloud save:",err);const el=document.getElementById("cloudText");if(el)el.innerHTML='<span class="cloud-dot"></span>Errore sincronizzazione cloud'})};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
 function monthLabel(month){const [y,m]=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(y),Number(m)-1,1))}
@@ -304,11 +304,22 @@ window.addEventListener("brcloud:status",e=>{
   const el=document.getElementById("cloudText"); if(!el)return;
   const u=e.detail.user;
   el.innerHTML=u?'<span class="cloud-dot on"></span>'+u.email:'<span class="cloud-dot"></span>Solo su questo dispositivo';
-  if(u) document.querySelector(".cloud-card .btn").textContent="Account attivo";
+  const btn=document.querySelector(".cloud-card .btn");
+  if(btn&&u)btn.textContent="Account attivo";
 });
 window.addEventListener("brcloud:loaded",e=>{
   const data=e.detail.data;if(!data)return;
-  try{localStorage.setItem("budget_reset_solo",JSON.stringify(data));location.reload()}catch{}
+  try{
+    const incoming=JSON.stringify(data),current=localStorage.getItem("budget_reset_solo");
+    if(incoming===current)return;
+    localStorage.setItem("budget_reset_solo",incoming);
+    location.reload();
+  }catch(err){console.warn("Cloud load:",err)}
+});
+window.addEventListener("brcloud:sync",e=>{
+  const el=document.getElementById("cloudText");if(!el)return;
+  if(e.detail.direction==="upload")el.innerHTML='<span class="cloud-dot on"></span>Dati salvati nel cloud';
+  if(e.detail.direction==="download")el.innerHTML='<span class="cloud-dot on"></span>Dati sincronizzati';
 });
 window.addEventListener("brcloud:local-found",()=>{
   const msg=confirm("Abbiamo trovato dati Budget Reset salvati su questo dispositivo. Vuoi salvarli nel tuo account cloud?");
