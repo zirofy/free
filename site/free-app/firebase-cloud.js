@@ -61,6 +61,24 @@ async function applyCloudData(cloudData,cloudUpdatedAt){
   return {action:"conflict",local,cloud:cloudData};
 }
 
+async function diagnose(){
+  await ready;
+  if(!firebaseConfigured)throw new Error("Firebase non è configurato.");
+  if(!db)throw new Error("Firestore non è stato inizializzato.");
+  if(!currentUser)throw new Error("Account non autenticato.");
+  const ref=doc(db,"users",currentUser.uid);
+  try{
+    const snap=await getDoc(ref);
+    return {ok:true,authenticated:true,firestoreReadable:true,exists:snap.exists(),uid:currentUser.uid,email:currentUser.email||""};
+  }catch(error){
+    const code=error?.code||"unknown";
+    let hint=error?.message||"Errore Firestore";
+    if(code==="permission-denied")hint="PERMISSION_DENIED: le Firestore Rules stanno rifiutando l'accesso dell'utente.";
+    else if(code==="failed-precondition")hint="FAILED_PRECONDITION: Firestore potrebbe non essere stato creato/abilitato correttamente.";
+    else if(code==="unavailable")hint="UNAVAILABLE: Firestore non è raggiungibile dalla rete.";
+    throw new Error(hint);
+  }
+}
 async function syncNow(){
   await ready;
   if(!db||!currentUser)throw new Error("Accedi a Budget Reset prima di sincronizzare.");
@@ -124,12 +142,20 @@ async function save(data){
   localStorage.setItem(localKey,JSON.stringify(data));
   await ready;
   if(!db||!currentUser)return {cloud:false};
-  return {cloud:true,data:await pushToCloud(data,"save")};
+  try{return {cloud:true,data:await pushToCloud(data,"save")}}
+  catch(error){
+    const code=error?.code||"unknown";
+    let message=error?.message||"Errore Firestore";
+    if(code==="permission-denied")message="PERMISSION_DENIED: verifica le Firestore Rules.";
+    else if(code==="failed-precondition")message="FAILED_PRECONDITION: verifica che Firestore Database sia stato creato e sia attivo.";
+    else if(code==="unavailable")message="UNAVAILABLE: Firestore non è raggiungibile.";
+    throw new Error(message);
+  }
 }
 async function signUp(email,password){if(!auth)throw new Error("Firebase non è ancora configurato.");return createUserWithEmailAndPassword(auth,email,password)}
 async function signIn(email,password){if(!auth)throw new Error("Firebase non è ancora configurato.");return signInWithEmailAndPassword(auth,email,password)}
 async function resetPassword(email){if(!auth)throw new Error("Firebase non è ancora configurato.");return sendPasswordResetEmail(auth,email)}
 async function logout(){if(auth)await signOut(auth)}
 async function migrateLocal(){const data=readLocal();await ready;if(!hasUsefulData(data))throw new Error("Non ci sono dati locali da importare.");await pushToCloud(data,"migration")}
-window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,resetPassword,logout,migrateLocal,save,syncNow,getUser:()=>currentUser,whenReady:()=>ready};
+window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,resetPassword,logout,migrateLocal,save,syncNow,diagnose,getUser:()=>currentUser,whenReady:()=>ready};
 startCloud();
