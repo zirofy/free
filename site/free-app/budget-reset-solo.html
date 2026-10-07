@@ -17,7 +17,9 @@ button.btn{background:var(--accent);color:#111;border:0;border-radius:9px;paddin
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px;border-bottom:1px solid var(--line);font-size:14px}th{font-size:11px;color:#aaa;text-transform:uppercase}.empty{text-align:center;color:#777;padding:25px}
 .notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}
 .deadline-normal{color:#bbb}.deadline-soon{color:#ff5c5c;font-weight:800}.deadline-today{color:#ff4545;font-weight:900}.deadline-overdue{color:#ff6b6b;font-weight:900;background:#351818;padding:4px 7px;border-radius:6px;display:inline-block}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.chart-wrap{width:100%;overflow:auto}.chart-svg{width:100%;min-width:620px;height:auto;display:block}.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.chart-legend span{font-size:12px;color:var(--muted)}.chart-legend b{color:var(--text)}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.icon-picker{display:flex;flex-wrap:wrap;gap:7px}.icon-choice{width:44px;height:44px;border:1px solid var(--line);background:#181818;color:#bbb;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}.icon-choice:hover,.icon-choice.active{border-color:var(--accent);color:var(--accent);background:#202600}.category-chip{display:inline-flex;align-items:center;gap:6px}.category-icon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}.category-icon svg{width:100%;height:100%;display:block}
+.chart-wrap{width:100%;overflow:auto}.chart-svg{width:100%;min-width:620px;height:auto;display:block}.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.chart-legend span{font-size:12px;color:var(--muted)}.chart-legend b{color:var(--text)}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
 @media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
 </style></head><body><div class="app">
 <aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
@@ -41,12 +43,15 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="card"><div class="label">Quanto hai speso quest'anno</div><div id="annualSpentTotal" class="value accent">€0</div><div id="annualSpentText" class="small" style="margin-top:5px">Somma delle spese effettivamente registrate nel 2026.</div><div class="notice" style="margin-top:13px"><strong>Obiettivo annuale</strong><br><span class="small">Le spese ricorrenti future non vengono aggiunte in anticipo: ogni rata/spesa incide solo nella sua data.</span></div></div></div></section>
 
 <section id="expenses" class="view"><header><div><h1>Spese</h1><div class="sub">Registrale in pochi secondi.</div></div></header><div class="card"><div class="formgrid">
-<input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"><option>Casa</option><option>Alimentari</option><option>Trasporti</option><option>Svago</option><option>Abbonamenti</option><option>Salute</option><option>Altro</option></select><input id="expenseDate" type="date"><input id="expenseDueDate" type="date" title="Scadenza"><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div>
+<input id="desc" placeholder="Descrizione"><input id="amount" type="number" step=".01" placeholder="Importo €"><select id="cat"></select><input id="expenseDate" type="date"><input id="expenseDueDate" type="date" title="Scadenza"><button class="btn" onclick="addExpense()">Aggiungi spesa</button></div>
 <label style="display:flex;align-items:center;gap:10px;margin-top:14px;cursor:pointer"><input id="repeatMonthly" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">Il prossimo mese questa stessa spesa verrà inserita automaticamente nello stesso giorno.</span></span></label>
 <div class="small" style="margin-top:9px">Se inserisci una <strong>Scadenza</strong>, Budget Reset avvierà il countdown e ti avviserà quando mancano 5 giorni.</div></div>
 <div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Mese corrente</div><div id="expenseMonthTitle" class="value" style="font-size:21px">—</div></div><span id="expenseMonthTotal" class="pill green">€0</span></div>
 <table style="margin-top:12px"><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th>Scadenza</th><th></th></tr></thead><tbody id="table"></tbody></table></div>
-<div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Spese ricorrenti</div><div class="small">Queste voci vengono riproposte ogni mese, ma incidono sul totale solo nel mese di competenza.</div></div><span id="recurringCount" class="pill">0</span></div><div id="recurringList" style="margin-top:12px"></div></div></section>
+<div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Spese ricorrenti</div><div class="small">Queste voci vengono riproposte ogni mese, ma incidono sul totale solo nel mese di competenza.</div></div><span id="recurringCount" class="pill">0</span></div><div id="recurringList" style="margin-top:12px"></div></div><div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Categorie</div><h2>Personalizza le tue categorie</h2><div class="small">Crea nuove categorie e assegna un'icona. Le categorie personalizzate vengono sincronizzate con il tuo account.</div></div></div>
+<div class="formgrid" style="margin-top:14px"><input id="newCategoryName" placeholder="es. Animali"><button class="btn" onclick="addCategory()">+ Aggiungi categoria</button></div>
+<div style="margin-top:12px"><div class="small" style="margin-bottom:7px">Scegli icona</div><div id="categoryIconPicker" class="icon-picker"></div></div>
+<div id="categoriesList" style="margin-top:15px"></div></div></section>
 
 <section id="goals" class="view"><header><div><h1>Obiettivi</h1><div class="sub">Imposta un obiettivo semplice: giornaliero, settimanale o mensile.</div></div></header>
 <div class="card"><div class="formgrid"><input id="gn" placeholder="es. Mettere da parte per vacanza"><select id="gf"><option value="giornaliero">Giornaliero</option><option value="settimanale" selected>Settimanale</option><option value="mensile">Mensile</option></select><input id="gt" type="number" step=".01" min="0" placeholder="Obiettivo €"><input id="gs" type="number" step=".01" min="0" placeholder="Già fatto €"><button class="btn" onclick="addGoal()">+ Crea obiettivo</button></div><div class="small" style="margin-top:10px">Esempi: “Mettere da parte 10 € al giorno”, “Risparmiare 50 € questa settimana”, “Accantonare 200 € questo mese”.</div></div>
@@ -64,7 +69,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div id="installmentsList" class="grid" style="margin-top:15px"></div></section>
 
 <section id="calendar" class="view"><header><div><h1>Calendario</h1><div class="sub">Programma le scadenze e guarda in anticipo cosa succederà nel mese. Le scadenze non diventano spese finché non le segni come pagate.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn secondary" onclick="calendarPrev()">←</button><input id="calendarMonth" type="month" style="width:150px" onchange="changeCalendarMonth()"><button class="btn secondary" onclick="calendarNext()">→</button><button class="btn" onclick="useCalendarMonthInDashboard()">Usa questo mese</button></div></header>
-<div class="card"><div class="formgrid"><input id="sdDesc" placeholder="es. Bolletta luce"><input id="sdAmount" type="number" step=".01" min="0" placeholder="Importo €"><input id="sdDate" type="date"><select id="sdCat"><option>Casa</option><option>Utenze</option><option>Abbonamenti</option><option>Assicurazioni</option><option>Auto</option><option>Salute</option><option>Altro</option></select><input id="sdNote" placeholder="Nota (facoltativa)"><button class="btn" onclick="addScheduled()">+ Programma scadenza</button></div>
+<div class="card"><div class="formgrid"><input id="sdDesc" placeholder="es. Bolletta luce"><input id="sdAmount" type="number" step=".01" min="0" placeholder="Importo €"><input id="sdDate" type="date"><select id="sdCat"></select><input id="sdNote" placeholder="Nota (facoltativa)"><button class="btn" onclick="addScheduled()">+ Programma scadenza</button></div>
 <label style="display:flex;align-items:center;gap:10px;margin-top:13px;cursor:pointer"><input id="sdRepeat" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">La scadenza comparirà automaticamente nei mesi successivi.</span></span></label></div>
 <div id="calendarSummary" class="grid three" style="margin-top:15px"></div>
 <div class="card" style="margin-top:15px"><div id="calendarGrid" class="calendar-grid"></div></div>
@@ -90,6 +95,24 @@ if(!Array.isArray(d.recurringExpenses))d.recurringExpenses=[];
 if(!Array.isArray(d.incomes))d.incomes=[];
 if(!Array.isArray(d.budgets))d.budgets=[];
 if(!Array.isArray(d.scheduled))d.scheduled=[];
+if(!Array.isArray(d.categories))d.categories=[];
+const DEFAULT_CATEGORIES=[
+  {id:'home',name:'Casa',icon:'home'},
+  {id:'groceries',name:'Alimentari',icon:'shopping-basket'},
+  {id:'transport',name:'Trasporti',icon:'car'},
+  {id:'leisure',name:'Svago',icon:'gamepad'},
+  {id:'subscriptions',name:'Abbonamenti',icon:'repeat'},
+  {id:'health',name:'Salute',icon:'heart-pulse'},
+  {id:'utilities',name:'Utenze',icon:'bolt'},
+  {id:'insurance',name:'Assicurazioni',icon:'shield'},
+  {id:'shopping',name:'Shopping',icon:'bag'},
+  {id:'education',name:'Istruzione',icon:'book'},
+  {id:'travel',name:'Viaggi',icon:'plane'},
+  {id:'pets',name:'Animali',icon:'paw'},
+  {id:'other',name:'Altro',icon:'dots'}
+];
+if(!d.categories.length)d.categories=DEFAULT_CATEGORIES.map(x=>({...x}));
+
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
@@ -281,6 +304,64 @@ function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.re
 function changeDashboardMonth(){dashboardMonth=document.getElementById('dashboardMonth').value||monthKey(todayKey());render()}
 function setIncome(){const amount=+document.getElementById('income').value||0;setMonthlyAmount(d.incomes,dashboardMonth,amount,'income');d.income=amount;save()}
 function setBudget(){const amount=+document.getElementById('budget').value||0;setMonthlyAmount(d.budgets,dashboardMonth,amount,'budget');d.budget=amount;save()}
+function categoryIconSvg(icon,size=18){
+  const common='viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  const icons={
+    home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
+    'shopping-basket':'<path d="M4 10h16l-1.5 10h-13L4 10Z"/><path d="m7 10 2-5"/><path d="m17 10-2-5"/><path d="M8 14h8"/><path d="M9 17h6"/>',
+    car:'<path d="M5 16l1.5-6h11L19 16"/><path d="M4 16h16v4H4z"/><circle cx="7.5" cy="20" r="1"/><circle cx="16.5" cy="20" r="1"/>',
+    gamepad:'<path d="M6 9h12a4 4 0 0 1 3.8 5l-1.1 4a2.5 2.5 0 0 1-4.4.8L14.8 17H9.2l-1.5 1.8A2.5 2.5 0 0 1 3.3 18l-1.1-4A4 4 0 0 1 6 9Z"/><path d="M8 12v4"/><path d="M6 14h4"/><circle cx="16" cy="13" r=".8" fill="currentColor"/><circle cx="18" cy="15" r=".8" fill="currentColor"/>',
+    repeat:'<path d="M4 7h12l-2-2"/><path d="m16 7-2 2"/><path d="M20 17H8l2 2"/><path d="m8 17 2-2"/><path d="M4 7v4"/><path d="M20 17v-4"/>',
+    'heart-pulse':'<path d="M20.8 8.7c0 5.2-8.8 11-8.8 11s-8.8-5.8-8.8-11A4.7 4.7 0 0 1 8 4c1.7 0 3.2.9 4 2.2A4.7 4.7 0 0 1 20.8 8.7Z"/><path d="M5.7 11h3l1.4-2.4 2.1 5 1.5-2.6h3.7"/>',
+    bolt:'<path d="m13 2-8 11h6l-1 9 8-11h-6l1-9Z"/>',
+    shield:'<path d="M12 3 19 6v5c0 4.6-3 7.9-7 10-4-2.1-7-5.4-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/>',
+    bag:'<path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9 13h6"/>',
+    book:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"/><path d="M8 20V7a3 3 0 0 1 3-3"/><path d="M11 9h5"/>',
+    plane:'<path d="m3 11 18-5-5 18-4-8-9-5Z"/><path d="m12 16 6-7"/>',
+    paw:'<circle cx="8" cy="8" r="2.2"/><circle cx="16" cy="8" r="2.2"/><circle cx="6" cy="14" r="2.2"/><circle cx="18" cy="14" r="2.2"/><path d="M12 12c-3 0-5 2-5 4 0 2 2 3 5 3s5-1 5-3c0-2-2-4-5-4Z"/>',
+    dots:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
+  };
+  return '<svg '+common+' width="'+size+'" height="'+size+'" aria-hidden="true">'+(icons[icon]||icons.dots)+'</svg>';
+}
+function getCategory(name){
+  return d.categories.find(c=>c.name===name)||{id:'other',name:name||'Altro',icon:'dots'};
+}
+function categoryHtml(name){
+  const c=getCategory(name);
+  return '<span class="category-chip"><span class="category-icon">'+categoryIconSvg(c.icon,18)+'</span>'+c.name+'</span>';
+}
+const CATEGORY_ICONS=['home','shopping-basket','car','gamepad','repeat','heart-pulse','bolt','shield','bag','book','plane','paw','dots'];
+let selectedCategoryIcon='wallet';
+function categoryPickerHtml(){
+  const icons=['home','shopping-basket','car','gamepad','repeat','heart-pulse','bolt','shield','bag','book','plane','paw','dots'];
+  return icons.map(icon=>'<button type="button" class="icon-choice '+(icon===selectedCategoryIcon?'active':'')+'" onclick="selectCategoryIcon(\''+icon+'\')" title="Icona">'+categoryIconSvg(icon,21)+'</button>').join('');
+}
+function renderCategoryControls(){
+  const cat=document.getElementById('cat'),sd=document.getElementById('sdCat');
+  const currentCat=cat?cat.value:'',currentSd=sd?sd.value:'';
+  const options=d.categories.map(c=>'<option value="'+String(c.name).replace(/"/g,'&quot;')+'">'+c.name+'</option>').join('');
+  if(cat){cat.innerHTML=options;cat.value=d.categories.some(c=>c.name===currentCat)?currentCat:(d.categories[0]?.name||'Altro')}
+  if(sd){sd.innerHTML=options;sd.value=d.categories.some(c=>c.name===currentSd)?currentSd:(d.categories[0]?.name||'Altro')}
+  const picker=document.getElementById('categoryIconPicker');if(picker)picker.innerHTML=categoryPickerHtml();
+  const list=document.getElementById('categoriesList');
+  if(list){
+    const custom=d.categories.filter(c=>!DEFAULT_CATEGORIES.some(x=>x.id===c.id));
+    list.innerHTML=d.categories.map(c=>'<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="category-chip"><span class="category-icon">'+categoryIconSvg(c.icon,19)+'</span><strong>'+c.name+'</strong></div>'+(!DEFAULT_CATEGORIES.some(x=>x.id===c.id)?'<button class="btn danger" onclick="removeCategory(\''+c.id+'\')">Elimina</button>':'<span class="small">Predefinita</span>')+'</div>').join('');
+  }
+}
+function selectCategoryIcon(icon){selectedCategoryIcon=icon;const p=document.getElementById('categoryIconPicker');if(p)p.innerHTML=categoryPickerHtml()}
+function addCategory(){
+  const input=document.getElementById('newCategoryName'),name=(input?.value||'').trim();
+  if(!name)return;
+  if(d.categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert('Questa categoria esiste già.');return}
+  const c={id:'custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),name,icon:selectedCategoryIcon==='wallet'?'dots':selectedCategoryIcon};
+  d.categories.push(c);if(input)input.value='';save();renderCategoryControls();
+}
+function removeCategory(id){
+  const c=d.categories.find(x=>x.id===id);if(!c)return;
+  if(d.expenses.some(x=>x.c===c.name)||d.recurringExpenses.some(x=>x.category===c.name)||d.scheduled.some(x=>x.category===c.name)){alert('Questa categoria è già utilizzata e non può essere eliminata.');return}
+  if(confirm('Eliminare la categoria “'+c.name+'”?')){d.categories=d.categories.filter(x=>x.id!==id);save();renderCategoryControls()}
+}
 function addExpense(){
   const x=document.getElementById('desc').value.trim(),a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value,date=document.getElementById('expenseDate').value||todayKey(),dueDate=document.getElementById('expenseDueDate').value||null,repeat=document.getElementById('repeatMonthly').checked;
   if(!x||a<=0)return;
@@ -512,7 +593,7 @@ function renderCalendar(){
   grid.innerHTML=cells;
   const scheduled=events.filter(x=>x.type==='scheduled'),monthActual=d.expenses.filter(x=>monthKey(x.date||x.due||'')===calendarMonth).reduce((s,x)=>s+x.a,0),planned=events.filter(x=>x.type==='scheduled'&&x.paid===false).reduce((s,x)=>s+x.amount,0);
   summary.innerHTML='<div class="card"><div class="label">Spese effettive</div><div class="value">'+eur(monthActual)+'</div></div><div class="card"><div class="label">Scadenze programmate non pagate</div><div class="value accent">'+eur(planned)+'</div></div><div class="card"><div class="label">Eventi nel mese</div><div class="value">'+events.length+'</div></div>';
-  list.innerHTML=scheduled.length?scheduled.map(ev=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div><strong>'+ev.title+'</strong><div class="small">'+formatDate(ev.date)+' · '+eur(ev.amount)+' · '+ev.meta+(ev.note?' · '+ev.note:'')+'</div></div><div>'+ (ev.paid?'<span class="pill green">Pagata</span>':'<button class="btn" onclick="markScheduledPaid(\''+ev.item.id+'\',\''+ev.date+'\')">Segna pagata</button>') +'</div></div>').join(''):'<div class="empty">Nessuna scadenza programmata nel mese.</div>';
+  list.innerHTML=scheduled.length?scheduled.map(ev=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div>'+categoryHtml(ev.meta==='Pagamento a rate'?'Rate':(ev.meta||'Altro'))+'<div><strong>'+ev.title+'</strong><div class="small">'+formatDate(ev.date)+' · '+eur(ev.amount)+' · '+ev.meta+(ev.note?' · '+ev.note:'')+'</div></div><div>'+ (ev.paid?'<span class="pill green">Pagata</span>':'<button class="btn" onclick="markScheduledPaid(\''+ev.item.id+'\',\''+ev.date+'\')">Segna pagata</button>') +'</div></div>').join(''):'<div class="empty">Nessuna scadenza programmata nel mese.</div>';
 }
 function initExpenseForm(){const date=document.getElementById('expenseDate');if(date&&!date.value)date.value=todayKey()}
 function stopRecurring(id){const r=d.recurringExpenses.find(x=>x.id===id);if(!r)return;if(!confirm('Smettere di ripetere questa spesa dal prossimo mese?'))return;r.active=false;save()}
@@ -520,7 +601,7 @@ function renderRecurring(){
   const list=document.getElementById('recurringList');if(!list)return;
   document.getElementById('recurringCount').textContent=d.recurringExpenses.filter(r=>r.active!==false).length;
   const active=d.recurringExpenses.filter(r=>r.active!==false);
-  list.innerHTML=active.length?active.map(r=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div><strong>'+r.name+'</strong><div class="small">'+eur(r.amount)+' · ogni mese · giorno '+String(r.day).padStart(2,'0')+'</div></div><button class="btn danger" onclick="stopRecurring(\''+r.id+'\')">Ferma</button></div>').join(''):'<div class="empty">Nessuna spesa ricorrente attiva.</div>';
+  list.innerHTML=active.length?active.map(r=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div>'+categoryHtml(r.category)+'<div><strong>'+r.name+'</strong><div class="small">'+eur(r.amount)+' · ogni mese · giorno '+String(r.day).padStart(2,'0')+'</div></div><button class="btn danger" onclick="stopRecurring(\''+r.id+'\')">Ferma</button></div>').join(''):'<div class="empty">Nessuna spesa ricorrente attiva.</div>';
 }
 function initInstallmentForm(){
   const s=document.getElementById('iCount');if(s&&!s.options.length)for(let i=3;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i+' rate';s.appendChild(o)}
@@ -587,7 +668,7 @@ function render(){
   const currentMonthKey=dashboardMonth;
   document.getElementById('expenseMonthTitle').textContent=monthLabel(currentMonthKey);
   document.getElementById('expenseMonthTotal').textContent=eur(total);
-  document.getElementById('table').innerHTML=monthExpenses.length?monthExpenses.map(x=>{const i=d.expenses.indexOf(x),due=x.dueDate?'<div class="'+deadlineClass(x.dueDate)+'">'+formatDate(x.dueDate)+'<div class="small">'+deadlineLabel(x.dueDate)+'</div></div>':'<span class="small">—</span>';return '<tr><td>'+formatDate(x.date||x.due)+'</td><td>'+x.x+(x.recurringKey?' <span class="pill">Ogni mese</span>':'')+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td>'+due+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>'}).join(''):'<tr><td colspan="6" class="empty">Nessuna spesa nel mese corrente.</td></tr>';
+  document.getElementById('table').innerHTML=monthExpenses.length?monthExpenses.map(x=>{const i=d.expenses.indexOf(x),due=x.dueDate?'<div class="'+deadlineClass(x.dueDate)+'">'+formatDate(x.dueDate)+'<div class="small">'+deadlineLabel(x.dueDate)+'</div></div>':'<span class="small">—</span>';return '<tr><td>'+formatDate(x.date||x.due)+'</td><td>'+x.x+(x.recurringKey?' <span class="pill">Ogni mese</span>':'')+'</td><td>'+categoryHtml(x.c||'Altro')+'</td><td>'+eur(x.a)+'</td><td>'+due+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>'}).join(''):'<tr><td colspan="6" class="empty">Nessuna spesa nel mese corrente.</td></tr>';
   renderRecurring();
   renderAnnualSummary();
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
