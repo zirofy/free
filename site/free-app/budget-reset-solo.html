@@ -26,6 +26,11 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="grid kpis"><div class="card"><div class="label">Entrate</div><div id="inc" class="value">€0</div></div><div class="card"><div class="label">Spese</div><div id="exp" class="value">€0</div><div id="expRate" class="small" style="margin-top:5px">Incluse rate: €0</div></div><div class="card"><div class="label">Disponibile</div><div id="avail" class="value accent">€0</div></div><div class="card"><div class="label">Risparmio</div><div id="rate" class="value">0%</div></div></div>
 <div class="grid two" style="margin-top:15px"><div class="card"><div class="row"><div><div class="label">Budget mensile</div><h2>Quanto puoi ancora spendere?</h2></div><span id="bp" class="pill green">0%</span></div><div class="progress"><div id="bb" class="bar" style="width:0%"></div></div><div class="row small"><span id="st">€0 spesi</span><span id="bt">Budget €0</span></div></div>
 <div class="card"><div class="label">Prossima azione</div><h2 id="next">Inserisci l'entrata.</h2><div class="small">Una decisione alla volta.</div></div></div>
+<div class="grid three" style="margin-top:15px">
+<div class="card"><div class="label">Saldo effettivo</div><div id="actualBalance" class="value accent">€0</div><div class="small" id="actualBalanceText">Entrata del mese meno spese già registrate.</div></div>
+<div class="card"><div class="label">Impegni programmati</div><div id="plannedCommitments" class="value">€0</div><div class="small" id="plannedCommitmentsText">Scadenze future non ancora pagate.</div></div>
+<div class="card"><div class="label">Saldo previsto</div><div id="forecastBalance" class="value accent">€0</div><div class="small" id="forecastBalanceText">Quanto resterebbe dopo gli impegni programmati.</div></div>
+</div>
 <div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrata del mese</div><div class="small" id="incomeMonthLabel" style="margin-top:5px">—</div><input id="income" type="number" step=".01" placeholder="5000" style="margin-top:10px"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva entrata</button></div>
 <div class="card"><div class="label">Budget del mese</div><div class="small" id="budgetMonthLabel" style="margin-top:5px">—</div><input id="budget" type="number" step=".01" placeholder="1500" style="margin-top:10px"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva budget</button></div>
 <div class="card"><div class="label">Mese di appartenenza</div><div class="small" style="margin-top:8px">Le entrate e il budget non sono più valori “senza mese”: ogni importo viene salvato nel mese selezionato in alto.</div></div></div>
@@ -55,7 +60,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="small" style="margin-top:10px">Esempio: acquisto il 03/10 → €200 il 03/10, €200 dopo 30 giorni (02/11) e €200 dopo altri 30 giorni (02/12).</div></div>
 <div id="installmentsList" class="grid" style="margin-top:15px"></div></section>
 
-<section id="calendar" class="view"><header><div><h1>Calendario</h1><div class="sub">Programma le scadenze e guarda in anticipo cosa succederà nel mese. Le scadenze non diventano spese finché non le segni come pagate.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn secondary" onclick="calendarPrev()">←</button><input id="calendarMonth" type="month" style="width:150px" onchange="changeCalendarMonth()"><button class="btn secondary" onclick="calendarNext()">→</button></div></header>
+<section id="calendar" class="view"><header><div><h1>Calendario</h1><div class="sub">Programma le scadenze e guarda in anticipo cosa succederà nel mese. Le scadenze non diventano spese finché non le segni come pagate.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn secondary" onclick="calendarPrev()">←</button><input id="calendarMonth" type="month" style="width:150px" onchange="changeCalendarMonth()"><button class="btn secondary" onclick="calendarNext()">→</button><button class="btn" onclick="useCalendarMonthInDashboard()">Usa questo mese</button></div></header>
 <div class="card"><div class="formgrid"><input id="sdDesc" placeholder="es. Bolletta luce"><input id="sdAmount" type="number" step=".01" min="0" placeholder="Importo €"><input id="sdDate" type="date"><select id="sdCat"><option>Casa</option><option>Utenze</option><option>Abbonamenti</option><option>Assicurazioni</option><option>Auto</option><option>Salute</option><option>Altro</option></select><input id="sdNote" placeholder="Nota (facoltativa)"><button class="btn" onclick="addScheduled()">+ Programma scadenza</button></div>
 <label style="display:flex;align-items:center;gap:10px;margin-top:13px;cursor:pointer"><input id="sdRepeat" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">La scadenza comparirà automaticamente nei mesi successivi.</span></span></label></div>
 <div id="calendarSummary" class="grid three" style="margin-top:15px"></div>
@@ -97,6 +102,40 @@ function setMonthlyAmount(list,month,amount,type){
   row.amount=amount;
 }
 function monthLabelLong(month){const p=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(p[0]),Number(p[1])-1,1))}
+function monthExpensesFor(month){return d.expenses.filter(x=>monthKey(x.date||x.due||todayKey())===month)}
+function recurringExpectedForMonth(month){
+  return d.recurringExpenses.filter(r=>{
+    const start=monthKey(r.startDate||'');
+    return r.active!==false&&start&&start<=month;
+  }).map(r=>{
+    const day=Number(r.day)||1,date=dateForMonth(month,day);
+    return {id:r.id,date,amount:Number(r.amount)||0,name:r.name,recorded:isExpenseRecordedForRecurring(r.id,date)};
+  });
+}
+function scheduledExpectedForMonth(month){
+  return scheduledOccurrencesForMonth(month).map(x=>({...x,paid:isScheduledPaid(x)}));
+}
+function rateExpectedForMonth(month){
+  const rows=[];
+  d.installments.forEach(debt=>(debt.schedule||[]).forEach(p=>{
+    if(monthKey(p.due)===month)rows.push({debt,p,amount:Number(p.amount)||0,date:p.due,paid:!!p.paid});
+  }));
+  return rows;
+}
+function monthlyFinancials(month){
+  const actual=monthExpensesFor(month).reduce((s,x)=>s+(Number(x.a)||0),0);
+  const income=getMonthlyAmount(d.incomes,month);
+  const budget=getMonthlyAmount(d.budgets,month);
+  const recurring=recurringExpectedForMonth(month);
+  const scheduled=scheduledExpectedForMonth(month);
+  const rates=rateExpectedForMonth(month);
+  const plannedRecurring=recurring.filter(x=>!x.recorded).reduce((s,x)=>s+x.amount,0);
+  const plannedScheduled=scheduled.filter(x=>!x.paid).reduce((s,x)=>s+x.amount,0);
+  const plannedRates=rates.filter(x=>!x.paid).reduce((s,x)=>s+x.amount,0);
+  const planned=Math.max(0,plannedRecurring+plannedScheduled+plannedRates);
+  const forecast=income-actual-planned;
+  return {income,budget,actual,planned,forecast,plannedRecurring,plannedScheduled,plannedRates};
+}
 
 function monthLabel(month){const [y,m]=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(y),Number(m)-1,1))}
 function dateForMonth(month,day){const [y,m]=month.split('-').map(Number);const last=new Date(y,m,0).getDate();return y+'-'+String(m).padStart(2,'0')+'-'+String(Math.min(day,last)).padStart(2,'0')}
@@ -294,6 +333,7 @@ function deleteScheduled(id){
 function calendarPrev(){calendarMonth=shiftMonth(calendarMonth,-1);syncCalendarControls();render()}
 function calendarNext(){calendarMonth=shiftMonth(calendarMonth,1);syncCalendarControls();render()}
 function changeCalendarMonth(){calendarMonth=document.getElementById('calendarMonth').value||monthKey(todayKey());render()}
+function useCalendarMonthInDashboard(){dashboardMonth=calendarMonth;view('dash',document.querySelector('.nav button'));}
 function shiftMonth(month,delta){const p=month.split('-').map(Number),dt=new Date(p[0],p[1]-1+delta,1);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')}
 function syncCalendarControls(){
   const cm=document.getElementById('calendarMonth');if(cm)cm.value=calendarMonth;
@@ -369,12 +409,18 @@ function renderInstallments(){
 function render(){
   ensureMonthlyData();
   syncRecurringExpenses();
-  const monthExpenses=d.expenses.filter(x=>monthKey(x.date||x.due||todayKey())===dashboardMonth);
-  const monthIncome=getMonthlyAmount(d.incomes,dashboardMonth),monthBudget=getMonthlyAmount(d.budgets,dashboardMonth);
+  const financials=monthlyFinancials(dashboardMonth);
+  const monthExpenses=monthExpensesFor(dashboardMonth),monthIncome=financials.income,monthBudget=financials.budget;
   d.income=monthIncome;d.budget=monthBudget;
-  let total=monthExpenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=monthExpenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=monthIncome-total,rate=monthIncome?Math.max(0,av/monthIncome*100):0,p=monthBudget?Math.min(100,total/monthBudget*100):0;
+  let total=financials.actual,rateExpenseTotal=monthExpenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=monthIncome-total,rate=monthIncome?Math.max(0,av/monthIncome*100):0,p=monthBudget?Math.min(100,total/monthBudget*100):0;
   document.getElementById('inc').textContent=eur(monthIncome);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
   document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(monthBudget);
+  document.getElementById('actualBalance').textContent=eur(av);
+  document.getElementById('actualBalanceText').textContent='Entrata del mese meno spese già registrate.';
+  document.getElementById('plannedCommitments').textContent=eur(financials.planned);
+  document.getElementById('plannedCommitmentsText').textContent=financials.planned?'Da rate, scadenze e spese ricorrenti non ancora registrate come pagate.':'Nessun impegno futuro nel mese.';
+  document.getElementById('forecastBalance').textContent=eur(financials.forecast);
+  document.getElementById('forecastBalanceText').textContent='Saldo effettivo meno gli impegni programmati del mese.';
   syncCalendarControls();
   const incomeInput=document.getElementById('income');if(incomeInput)incomeInput.value=monthIncome||'';
   const budgetInput=document.getElementById('budget');if(budgetInput)budgetInput.value=monthBudget||'';
@@ -382,7 +428,7 @@ function render(){
   const budgetMonthLabel=document.getElementById('budgetMonthLabel');if(budgetMonthLabel)budgetMonthLabel.textContent=monthLabelLong(dashboardMonth);
   const allFuture=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.paid).sort((a,b)=>a.due.localeCompare(b.due));
   const due=allFuture.find(x=>x.due<=todayKey()),nextRate=allFuture[0],nextRateDays=nextRate?daysFromToday(nextRate.due):null;
-  document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':due?'Hai una rata da verificare: '+eur(due.amount):nextRate?'Prossima rata: '+eur(nextRate.amount)+' il '+formatDate(nextRate.due):!d.goals.length?'Crea il tuo primo obiettivo.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
+  document.getElementById('next').textContent=!monthIncome?'Inserisci l’entrata di '+monthLabelLong(dashboardMonth)+'.':!monthBudget?'Imposta il budget di '+monthLabelLong(dashboardMonth)+'.':due?'Hai una rata da verificare: '+eur(due.amount):financials.planned>0?'Hai '+eur(financials.planned)+' di impegni ancora programmati nel mese.':!d.goals.length?'Crea il tuo primo obiettivo.':total>monthBudget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
   const countdownCard=document.getElementById('instCountdownCard'),countdown=document.getElementById('instCountdown'),countdownTextEl=document.getElementById('instCountdownText');
   if(nextRate){
     countdown.textContent=countdownText(nextRateDays);
@@ -392,7 +438,7 @@ function render(){
   }else{
     countdown.textContent='—';countdownTextEl.textContent='Nessuna scadenza futura.';countdownCard.className='card';countdownCard.style.borderLeft='';
   }
-  const currentMonthKey=monthKey(todayKey());
+  const currentMonthKey=dashboardMonth;
   document.getElementById('expenseMonthTitle').textContent=monthLabel(currentMonthKey);
   document.getElementById('expenseMonthTotal').textContent=eur(total);
   document.getElementById('table').innerHTML=monthExpenses.length?monthExpenses.map(x=>{const i=d.expenses.indexOf(x);return '<tr><td>'+formatDate(x.date||x.due)+'</td><td>'+x.x+(x.recurringKey?' <span class="pill">Ogni mese</span>':'')+'</td><td><span class="pill">'+(x.c||'Altro')+'</span></td><td>'+eur(x.a)+'</td><td><button class="btn danger" onclick="del('+i+')">×</button></td></tr>'}).join(''):'<tr><td colspan="5" class="empty">Nessuna spesa nel mese corrente.</td></tr>';
@@ -401,8 +447,8 @@ function render(){
   document.getElementById('goalsList').innerHTML=d.goals.length?d.goals.map((g,i)=>{let q=Math.min(100,g.s/g.t*100);return '<div class="card"><div class="row"><div><div class="label">'+(g.f||'mensile')+'</div><div class="value" style="font-size:21px">'+g.n+'</div></div><span class="pill green">'+q.toFixed(0)+'%</span></div><div class="progress"><div class="bar" style="width:'+q+'%"></div></div><div class="row small"><span>'+eur(g.s)+' di '+eur(g.t)+'</span><span>'+(q>=100?'Completato':'In corso')+'</span></div><div class="row" style="margin-top:13px"><button class="btn" onclick="updateGoal('+i+')">+ Aggiorna</button><button class="btn danger" onclick="delGoal('+i+')">Elimina</button></div></div>'}).join(''):'<div class="card"><div class="empty">Nessun obiettivo. Creane uno in pochi secondi.</div></div>';
   let a=d.splits.filter(x=>x.w==="A").reduce((s,x)=>s+x.a,0),b=d.splits.filter(x=>x.w==="B").reduce((s,x)=>s+x.a,0),z=(a-b)/2;const splitEl=document.getElementById("split");if(splitEl)splitEl.textContent=d.splits.length?"A: "+eur(a)+" · B: "+eur(b)+" · "+(Math.abs(z)<.01?"Siete in pari":(z>0?"B deve ad A ":"A deve a B ")+eur(Math.abs(z))):"Nessuna spesa condivisa.";
   const emtxt=document.getElementById('emtxt');if(emtxt){const e=d.emergency||{};emtxt.textContent=e.target?'Obiettivo: '+eur(e.target)+(e.months?' · '+e.months+' mesi di spese':''):'Nessun obiettivo di emergenza impostato.';}
-  const month=monthKey(todayKey()),monthRate=d.expenses.filter(x=>x.rateKey&&monthKey(x.due||'')===month).reduce((s,x)=>s+x.a,0),dashboardNextRate=allFuture[0];
-  document.getElementById('instMonth').textContent=eur(monthRate);document.getElementById('instMonthText').textContent=monthRate?'Rate pagate e incluse nelle spese del mese.':'Nessuna rata pagata questo mese.';
+  const month=dashboardMonth,monthRate=d.expenses.filter(x=>x.rateKey&&monthKey(x.due||'')===month).reduce((s,x)=>s+x.a,0),dashboardNextRate=allFuture[0];
+  document.getElementById('instMonth').textContent=eur(monthRate);document.getElementById('instMonthText').textContent=monthRate?'Rate pagate e incluse nelle spese del mese selezionato.':'Nessuna rata pagata nel mese selezionato.';
   document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due)+' · intervallo 30 giorni':'Nessuna rata futura.';
   renderInstallments();
   renderCalendar();
