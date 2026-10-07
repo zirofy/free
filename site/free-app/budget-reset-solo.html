@@ -15,19 +15,20 @@ button.btn{background:var(--accent);color:#111;border:0;border-radius:9px;paddin
 .progress{height:10px;background:#333;border-radius:999px;overflow:hidden;margin:13px 0}.bar{height:100%;background:var(--accent);border-radius:999px}
 .view{display:none}.view.active{display:block}.pill{padding:4px 8px;border-radius:999px;background:#333;color:#bbb;font-size:12px}.pill.green{color:var(--accent);background:#303b14}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px;border-bottom:1px solid var(--line);font-size:14px}th{font-size:11px;color:#aaa;text-transform:uppercase}.empty{text-align:center;color:#777;padding:25px}
-.notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
+.notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
 @media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
 </style></head><body><div class="app">
 <aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
-<nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
+<nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('calendar',this)">Calendario</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
 <main class="main">
-<section id="dash" class="view active"><div class="card cloud-card"><div class="cloud-status"><div><div class="label">I TUOI DATI</div><div id="cloudText"><span class="cloud-dot"></span>Solo su questo dispositivo</div></div><div class="cloud-actions"><button id="accountBtn" class="btn" onclick="openAuth()">Account</button><button id="logoutBtn" class="btn danger" style="display:none" onclick="cloudLogout()">Logout</button></div></div></div><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><button class="btn secondary" onclick="resetData()">Reset</button></header>
+<section id="dash" class="view active"><div class="card cloud-card"><div class="cloud-status"><div><div class="label">I TUOI DATI</div><div id="cloudText"><span class="cloud-dot"></span>Accesso non effettuato</div></div><div class="cloud-actions"><button id="accountBtn" class="btn" onclick="openAuth()">Account</button><button id="logoutBtn" class="btn danger" style="display:none" onclick="cloudLogout()">Logout</button></div></div></div><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><div style="display:flex;gap:8px;align-items:center"><label class="small" for="dashboardMonth">Mese</label><input id="dashboardMonth" type="month" style="width:150px" onchange="changeDashboardMonth()"><button class="btn secondary" onclick="resetData()">Reset</button></div></header>
 <div class="grid kpis"><div class="card"><div class="label">Entrate</div><div id="inc" class="value">€0</div></div><div class="card"><div class="label">Spese</div><div id="exp" class="value">€0</div><div id="expRate" class="small" style="margin-top:5px">Incluse rate: €0</div></div><div class="card"><div class="label">Disponibile</div><div id="avail" class="value accent">€0</div></div><div class="card"><div class="label">Risparmio</div><div id="rate" class="value">0%</div></div></div>
 <div class="grid two" style="margin-top:15px"><div class="card"><div class="row"><div><div class="label">Budget mensile</div><h2>Quanto puoi ancora spendere?</h2></div><span id="bp" class="pill green">0%</span></div><div class="progress"><div id="bb" class="bar" style="width:0%"></div></div><div class="row small"><span id="st">€0 spesi</span><span id="bt">Budget €0</span></div></div>
 <div class="card"><div class="label">Prossima azione</div><h2 id="next">Inserisci l'entrata.</h2><div class="small">Una decisione alla volta.</div></div></div>
-<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrate</div><input id="income" type="number" step=".01" placeholder="2000"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva</button></div>
-<div class="card"><div class="label">Budget</div><input id="budget" type="number" step=".01" placeholder="1500"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva</button></div>
-<div class="card"><div class="label">Principio</div><div class="small" style="margin-top:8px">Misura ciò che accade davvero. Poi fai una piccola correzione.</div></div></div>
+<div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Entrata del mese</div><div class="small" id="incomeMonthLabel" style="margin-top:5px">—</div><input id="income" type="number" step=".01" placeholder="5000" style="margin-top:10px"><button class="btn" style="margin-top:9px" onclick="setIncome()">Salva entrata</button></div>
+<div class="card"><div class="label">Budget del mese</div><div class="small" id="budgetMonthLabel" style="margin-top:5px">—</div><input id="budget" type="number" step=".01" placeholder="1500" style="margin-top:10px"><button class="btn" style="margin-top:9px" onclick="setBudget()">Salva budget</button></div>
+<div class="card"><div class="label">Mese di appartenenza</div><div class="small" style="margin-top:8px">Le entrate e il budget non sono più valori “senza mese”: ogni importo viene salvato nel mese selezionato in alto.</div></div></div>
 <div class="grid three" style="margin-top:15px"><div class="card"><div class="label">Rate pagate questo mese</div><div id="instMonth" class="value accent">€0</div><div id="instMonthText" class="small">Nessun pagamento rateale registrato.</div></div><div class="card"><div class="label">Prossima rata</div><div id="instNext" class="value">—</div><div id="instNextText" class="small">Nessuna rata futura.</div></div><div id="instCountdownCard" class="card"><div class="label">Countdown prossima rata</div><div id="instCountdown" class="value accent">—</div><div id="instCountdownText" class="small">Nessuna scadenza imminente.</div></div></div>
 <div class="grid two" style="margin-top:15px"><div class="card"><div class="row"><div><div class="label">Costi annuali ricorrenti</div><h2 id="annualFixedTotal">€0</h2></div><span id="annualYear" class="pill green">2026</span></div><div class="small" style="margin:4px 0 12px">Proiezione annuale delle spese ricorrenti: importo mensile × 12. Non modifica il totale del mese corrente.</div><div id="annualRecurringList"></div></div>
 <div class="card"><div class="label">Quanto hai speso quest'anno</div><div id="annualSpentTotal" class="value accent">€0</div><div id="annualSpentText" class="small" style="margin-top:5px">Somma delle spese effettivamente registrate nel 2026.</div><div class="notice" style="margin-top:13px"><strong>Obiettivo annuale</strong><br><span class="small">Le spese ricorrenti future non vengono aggiunte in anticipo: ogni rata/spesa incide solo nella sua data.</span></div></div></div></section>
@@ -54,23 +55,49 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="small" style="margin-top:10px">Esempio: acquisto il 03/10 → €200 il 03/10, €200 dopo 30 giorni (02/11) e €200 dopo altri 30 giorni (02/12).</div></div>
 <div id="installmentsList" class="grid" style="margin-top:15px"></div></section>
 
+<section id="calendar" class="view"><header><div><h1>Calendario</h1><div class="sub">Programma le scadenze e guarda in anticipo cosa succederà nel mese. Le scadenze non diventano spese finché non le segni come pagate.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn secondary" onclick="calendarPrev()">←</button><input id="calendarMonth" type="month" style="width:150px" onchange="changeCalendarMonth()"><button class="btn secondary" onclick="calendarNext()">→</button></div></header>
+<div class="card"><div class="formgrid"><input id="sdDesc" placeholder="es. Bolletta luce"><input id="sdAmount" type="number" step=".01" min="0" placeholder="Importo €"><input id="sdDate" type="date"><select id="sdCat"><option>Casa</option><option>Utenze</option><option>Abbonamenti</option><option>Assicurazioni</option><option>Auto</option><option>Salute</option><option>Altro</option></select><input id="sdNote" placeholder="Nota (facoltativa)"><button class="btn" onclick="addScheduled()">+ Programma scadenza</button></div>
+<label style="display:flex;align-items:center;gap:10px;margin-top:13px;cursor:pointer"><input id="sdRepeat" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">La scadenza comparirà automaticamente nei mesi successivi.</span></span></label></div>
+<div id="calendarSummary" class="grid three" style="margin-top:15px"></div>
+<div class="card" style="margin-top:15px"><div id="calendarGrid" class="calendar-grid"></div></div>
+<div class="card" style="margin-top:15px"><div class="label">Scadenze del mese</div><div id="calendarList" style="margin-top:10px"></div></div></section>
+
 <section id="review" class="view"><header><div><h1>Review settimanale</h1><div class="sub">5 minuti per decidere la prossima settimana.</div></div></header>
 <div class="card"><div class="grid"><input id="q1" placeholder="Quale spesa ti ha sorpreso?"><input id="q2" placeholder="Cosa potresti ridurre senza sacrifici?"><select id="q3"><option>Sono dentro il budget</option><option>Sono quasi dentro</option><option>Sono oltre il budget</option></select><input id="q4" placeholder="Priorità della prossima settimana"><input id="q5" placeholder="Una azione entro 24 ore"><button class="btn" onclick="saveReview()">Salva review</button><div id="saved" class="notice" style="display:none">Review salvata. Hai una prossima azione.</div></div></div></section>
 </main></div>
 <script>
 const KEY="budget_reset_solo";
-let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[],"recurringExpenses":[]}');
+let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[],"recurringExpenses":[],"incomes":[],"budgets":[],"scheduled":[] }');
 if(!Array.isArray(d.expenses))d.expenses=[];
 if(!Array.isArray(d.goals))d.goals=[];
 if(!Array.isArray(d.splits))d.splits=[];
 if(!Array.isArray(d.installments))d.installments=[];
 if(!Array.isArray(d.recurringExpenses))d.recurringExpenses=[];
+if(!Array.isArray(d.incomes))d.incomes=[];
+if(!Array.isArray(d.budgets))d.budgets=[];
+if(!Array.isArray(d.scheduled))d.scheduled=[];
 d.installments.forEach(debt=>(debt.schedule||[]).forEach(pay=>{if(pay.recorded&&!pay.paid)pay.paid=true}));
 repairInstallmentSchedules();
 const eur=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
 const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render();if(window.BRCloud?.configured)window.BRCloud.save(d).catch(err=>{console.warn("Cloud save:",err);const el=document.getElementById("cloudText");if(el)el.innerHTML='<span class="cloud-dot"></span>Errore sincronizzazione cloud'})};
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
+let dashboardMonth=monthKey(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-01');
+let calendarMonth=dashboardMonth;
+function ensureMonthlyData(){
+  const current=monthKey(todayKey());
+  if(!d.incomes.length&&Number(d.income||0)>0){d.incomes.push({id:'income_legacy',month:current,amount:Number(d.income)||0});}
+  if(!d.budgets.length&&Number(d.budget||0)>0){d.budgets.push({id:'budget_legacy',month:current,amount:Number(d.budget)||0});}
+}
+ensureMonthlyData();
+function getMonthlyAmount(list,month){const row=list.find(x=>x.month===month);return row?Number(row.amount)||0:0}
+function setMonthlyAmount(list,month,amount,type){
+  let row=list.find(x=>x.month===month);
+  if(!row){row={id:type+'_'+month+'_'+Date.now(),month,amount:0};list.push(row)}
+  row.amount=amount;
+}
+function monthLabelLong(month){const p=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(p[0]),Number(p[1])-1,1))}
+
 function monthLabel(month){const [y,m]=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(new Date(Number(y),Number(m)-1,1))}
 function dateForMonth(month,day){const [y,m]=month.split('-').map(Number);const last=new Date(y,m,0).getDate();return y+'-'+String(m).padStart(2,'0')+'-'+String(Math.min(day,last)).padStart(2,'0')}
 function currentMonthExpenses(){const m=monthKey(todayKey());return d.expenses.filter(x=>monthKey(x.date||x.due||todayKey())===m)}
@@ -149,8 +176,9 @@ function countdownClass(days){
   return days<=5?'notice':'card';
 }
 function view(id,b){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
-function setIncome(){d.income=+document.getElementById('income').value||0;save()}
-function setBudget(){d.budget=+document.getElementById('budget').value||0;save()}
+function changeDashboardMonth(){dashboardMonth=document.getElementById('dashboardMonth').value||monthKey(todayKey());render()}
+function setIncome(){const amount=+document.getElementById('income').value||0;setMonthlyAmount(d.incomes,dashboardMonth,amount,'income');d.income=amount;save()}
+function setBudget(){const amount=+document.getElementById('budget').value||0;setMonthlyAmount(d.budgets,dashboardMonth,amount,'budget');d.budget=amount;save()}
 function addExpense(){
   const x=document.getElementById('desc').value.trim(),a=+document.getElementById('amount').value||0,c=document.getElementById('cat').value,date=document.getElementById('expenseDate').value||todayKey(),repeat=document.getElementById('repeatMonthly').checked;
   if(!x||a<=0)return;
@@ -227,6 +255,79 @@ function delInstallment(id){
   d.expenses=d.expenses.filter(x=>!x.rateKey||!x.rateKey.startsWith(id+'-'));
   d.installments=d.installments.filter(x=>x.id!==id);save();
 }
+function scheduledKey(id,date){return id+'_'+date}
+function scheduledOccurrencesForMonth(month){
+  const rows=[];
+  d.scheduled.forEach(item=>{
+    const start=monthKey(item.date||'');
+    if(!start||start>month)return;
+    if(item.repeatMonthly){
+      const day=Number((item.date||'').slice(8,10));
+      rows.push({...item,date:dateForMonth(month,day),occurrenceKey:scheduledKey(item.id,dateForMonth(month,day))});
+    }else if(start===month){
+      rows.push({...item,occurrenceKey:scheduledKey(item.id,item.date)});
+    }
+  });
+  return rows.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function isScheduledPaid(item){
+  return d.expenses.some(x=>x.scheduledKey===item.occurrenceKey);
+}
+function addScheduled(){
+  const title=document.getElementById('sdDesc').value.trim(),amount=+document.getElementById('sdAmount').value||0,date=document.getElementById('sdDate').value||todayKey(),category=document.getElementById('sdCat').value,note=document.getElementById('sdNote').value.trim(),repeat=document.getElementById('sdRepeat').checked;
+  if(!title||amount<=0||!date)return;
+  d.scheduled.push({id:'sch_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),title,amount,category,date,note,repeatMonthly:repeat});
+  document.getElementById('sdDesc').value='';document.getElementById('sdAmount').value='';document.getElementById('sdDate').value=todayKey();document.getElementById('sdNote').value='';document.getElementById('sdRepeat').checked=false;save();calendarMonth=monthKey(date);
+  render();
+}
+function markScheduledPaid(id,date){
+  const item=d.scheduled.find(x=>x.id===id);if(!item)return;
+  const occ={...item,date,occurrenceKey:scheduledKey(id,date)};
+  if(isScheduledPaid(occ))return;
+  d.expenses.push({x:item.title,a:item.amount,c:item.category,date,scheduledKey:occ.occurrenceKey,scheduledId:id,paidAt:todayKey()});
+  save();
+}
+function deleteScheduled(id){
+  if(!confirm('Eliminare questa scadenza programmata? Le spese già segnate come pagate rimarranno nello storico.'))return;
+  d.scheduled=d.scheduled.filter(x=>x.id!==id);save();
+}
+function calendarPrev(){calendarMonth=shiftMonth(calendarMonth,-1);syncCalendarControls();render()}
+function calendarNext(){calendarMonth=shiftMonth(calendarMonth,1);syncCalendarControls();render()}
+function changeCalendarMonth(){calendarMonth=document.getElementById('calendarMonth').value||monthKey(todayKey());render()}
+function shiftMonth(month,delta){const p=month.split('-').map(Number),dt=new Date(p[0],p[1]-1+delta,1);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')}
+function syncCalendarControls(){
+  const cm=document.getElementById('calendarMonth');if(cm)cm.value=calendarMonth;
+  const dm=document.getElementById('dashboardMonth');if(dm)dm.value=dashboardMonth;
+}
+function calendarEvents(month){
+  const events=[];
+  d.incomes.filter(x=>x.month===month&&Number(x.amount||0)>0).forEach(x=>events.push({date:dateForMonth(month,1),title:'Entrata',amount:x.amount,type:'income',meta:'Entrata del mese'}));
+  d.installments.forEach(debt=>(debt.schedule||[]).forEach(p=>{if(monthKey(p.due)===month)events.push({date:p.due,title:debt.name+' · rata '+p.n+'/'+debt.count,amount:p.amount,type:'rate',paid:!!p.paid,meta:'Pagamento a rate'});}));
+  d.recurringExpenses.filter(r=>r.active!==false).forEach(r=>{const start=monthKey(r.startDate||'');if(start&&start<=month){const day=Number(r.day)||1;const date=dateForMonth(month,day);events.push({date,title:r.name,amount:r.amount,type:'recurring',paid:isExpenseRecordedForRecurring(r.id,date),meta:'Spesa ricorrente'});}});
+  scheduledOccurrencesForMonth(month).forEach(x=>events.push({date:x.date,title:x.title,amount:x.amount,type:'scheduled',paid:isScheduledPaid(x),meta:x.category,note:x.note,item:x}));
+  return events.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function isExpenseRecordedForRecurring(id,date){return d.expenses.some(x=>x.recurringId===id&&x.date===date)}
+function renderCalendar(){
+  syncCalendarControls();
+  const grid=document.getElementById('calendarGrid'),list=document.getElementById('calendarList'),summary=document.getElementById('calendarSummary');if(!grid||!list||!summary)return;
+  const events=calendarEvents(calendarMonth),p=calendarMonth.split('-').map(Number),first=new Date(p[0],p[1]-1,1),daysInMonth=new Date(p[0],p[1],0).getDate(),offset=(first.getDay()+6)%7,prevDays=new Date(p[0],p[1]-1,0).getDate();
+  let cells='';
+  ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'].forEach(x=>cells+='<div class="calendar-head">'+x+'</div>');
+  for(let i=0;i<offset;i++){cells+='<div class="calendar-day muted"><div class="calendar-day-number">'+(prevDays-offset+i+1)+'</div></div>'}
+  for(let day=1;day<=daysInMonth;day++){
+    const date=p[0]+'-'+String(p[1]).padStart(2,'0')+'-'+String(day).padStart(2,'0'),dayEvents=events.filter(x=>x.date===date),today=date===todayKey();
+    cells+='<div class="calendar-day '+(today?'today':'')+'"><div class="calendar-day-number">'+day+'</div>'+dayEvents.slice(0,5).map(ev=>{
+      const paid=ev.paid?' paid':'',safeTitle=String(ev.title).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return '<div class="calendar-event '+ev.type+paid+'" title="'+safeTitle+'">'+safeTitle+'<div class="calendar-amount">'+eur(ev.amount)+'</div>'+((ev.type==='scheduled'&&!ev.paid)?'<div class="calendar-actions"><button class="btn" onclick="markScheduledPaid(\''+ev.item.id+'\',\''+ev.date+'\')">Segna pagata</button></div>':'')+'</div>';
+    }).join('')+(dayEvents.length>5?'<div class="small">+'+(dayEvents.length-5)+' altro</div>':'')+'</div>';
+  }
+  while((offset+daysInMonth)%7!==0){cells+='<div class="calendar-day muted"></div>';if((offset+daysInMonth)%7===0)break;daysInMonth++}
+  grid.innerHTML=cells;
+  const scheduled=events.filter(x=>x.type==='scheduled'),monthActual=d.expenses.filter(x=>monthKey(x.date||x.due||'')===calendarMonth).reduce((s,x)=>s+x.a,0),planned=events.filter(x=>x.type==='scheduled'&&x.paid===false).reduce((s,x)=>s+x.amount,0);
+  summary.innerHTML='<div class="card"><div class="label">Spese effettive</div><div class="value">'+eur(monthActual)+'</div></div><div class="card"><div class="label">Scadenze programmate non pagate</div><div class="value accent">'+eur(planned)+'</div></div><div class="card"><div class="label">Eventi nel mese</div><div class="value">'+events.length+'</div></div>';
+  list.innerHTML=scheduled.length?scheduled.map(ev=>'<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><div><strong>'+ev.title+'</strong><div class="small">'+formatDate(ev.date)+' · '+eur(ev.amount)+' · '+ev.meta+(ev.note?' · '+ev.note:'')+'</div></div><div>'+ (ev.paid?'<span class="pill green">Pagata</span>':'<button class="btn" onclick="markScheduledPaid(\''+ev.item.id+'\',\''+ev.date+'\')">Segna pagata</button>') +'</div></div>').join(''):'<div class="empty">Nessuna scadenza programmata nel mese.</div>';
+}
 function initExpenseForm(){const date=document.getElementById('expenseDate');if(date&&!date.value)date.value=todayKey()}
 function stopRecurring(id){const r=d.recurringExpenses.find(x=>x.id===id);if(!r)return;if(!confirm('Smettere di ripetere questa spesa dal prossimo mese?'))return;r.active=false;save()}
 function renderRecurring(){
@@ -266,11 +367,19 @@ function renderInstallments(){
   }).join('');
 }
 function render(){
+  ensureMonthlyData();
   syncRecurringExpenses();
-  const monthExpenses=currentMonthExpenses();
-  let total=monthExpenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=monthExpenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=d.income-total,rate=d.income?Math.max(0,av/d.income*100):0,p=d.budget?Math.min(100,total/d.budget*100):0;
-  document.getElementById('inc').textContent=eur(d.income);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
-  document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(d.budget);
+  const monthExpenses=d.expenses.filter(x=>monthKey(x.date||x.due||todayKey())===dashboardMonth);
+  const monthIncome=getMonthlyAmount(d.incomes,dashboardMonth),monthBudget=getMonthlyAmount(d.budgets,dashboardMonth);
+  d.income=monthIncome;d.budget=monthBudget;
+  let total=monthExpenses.reduce((s,x)=>s+x.a,0),rateExpenseTotal=monthExpenses.filter(x=>x.rateKey).reduce((s,x)=>s+x.a,0),av=monthIncome-total,rate=monthIncome?Math.max(0,av/monthIncome*100):0,p=monthBudget?Math.min(100,total/monthBudget*100):0;
+  document.getElementById('inc').textContent=eur(monthIncome);document.getElementById('exp').textContent=eur(total);document.getElementById('avail').textContent=eur(av);document.getElementById('rate').textContent=rate.toFixed(0)+'%';document.getElementById('expRate').textContent='Incluse rate pagate: '+eur(rateExpenseTotal);
+  document.getElementById('bb').style.width=p+'%';document.getElementById('bp').textContent=p.toFixed(0)+'%';document.getElementById('st').textContent=eur(total)+' spesi';document.getElementById('bt').textContent='Budget '+eur(monthBudget);
+  syncCalendarControls();
+  const incomeInput=document.getElementById('income');if(incomeInput)incomeInput.value=monthIncome||'';
+  const budgetInput=document.getElementById('budget');if(budgetInput)budgetInput.value=monthBudget||'';
+  const incomeMonthLabel=document.getElementById('incomeMonthLabel');if(incomeMonthLabel)incomeMonthLabel.textContent=monthLabelLong(dashboardMonth);
+  const budgetMonthLabel=document.getElementById('budgetMonthLabel');if(budgetMonthLabel)budgetMonthLabel.textContent=monthLabelLong(dashboardMonth);
   const allFuture=d.installments.flatMap(x=>(x.schedule||[]).map(p=>({...p,debt:x}))).filter(x=>!x.paid).sort((a,b)=>a.due.localeCompare(b.due));
   const due=allFuture.find(x=>x.due<=todayKey()),nextRate=allFuture[0],nextRateDays=nextRate?daysFromToday(nextRate.due):null;
   document.getElementById('next').textContent=!d.income?'Inserisci l’entrata.':!d.budget?'Imposta il budget.':due?'Hai una rata da verificare: '+eur(due.amount):nextRate?'Prossima rata: '+eur(nextRate.amount)+' il '+formatDate(nextRate.due):!d.goals.length?'Crea il tuo primo obiettivo.':total>d.budget?'Sei oltre il budget: scegli cosa correggere.':'Continua a registrare le spese.';
@@ -296,8 +405,9 @@ function render(){
   document.getElementById('instMonth').textContent=eur(monthRate);document.getElementById('instMonthText').textContent=monthRate?'Rate pagate e incluse nelle spese del mese.':'Nessuna rata pagata questo mese.';
   document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due)+' · intervallo 30 giorni':'Nessuna rata futura.';
   renderInstallments();
+  renderCalendar();
 }
-initExpenseForm();initInstallmentForm();repairClosedInstallments();render();
+initExpenseForm();initInstallmentForm();repairClosedInstallments();syncCalendarControls();render();
 </script><div id="authModal" class="modal-backdrop" onclick="if(event.target===this)closeAuth()"><div class="modal"><div class="row"><h2 id="authTitle">Account</h2><button class="btn secondary" onclick="closeAuth()">Chiudi</button></div><div id="authGuest"><div class="small" style="margin-bottom:15px">Crea un account gratuito per usare Budget Reset su più dispositivi.</div><div class="grid"><input id="authEmail" type="email" placeholder="La tua email"><div class="password-wrap"><input id="authPassword" type="password" placeholder="Password (min. 6 caratteri)" autocomplete="current-password"><button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Mostra password">◉</button></div><div class="cloud-actions"><button class="btn" onclick="cloudCreate()">Crea account</button><button class="btn secondary" onclick="cloudLogin()">Accedi</button><button class="btn secondary" onclick="cloudResetPassword()">Password dimenticata</button></div></div></div><div id="authUser" style="display:none"><div class="notice"><strong>Account attivo</strong><br><span id="authUserEmail" class="small"></span></div><button class="btn danger" style="margin-top:15px" onclick="cloudLogout()">Logout</button></div><div id="authMsg" class="small" style="margin-top:12px"></div></div></div><script type="module">
 import "./firebase-cloud.js";
 window.addEventListener("brcloud:status",e=>{
