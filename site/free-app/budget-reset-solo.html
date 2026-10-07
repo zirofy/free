@@ -20,7 +20,54 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
 .icon-picker{display:flex;flex-wrap:wrap;gap:7px}.icon-choice{width:44px;height:44px;border:1px solid var(--line);background:#181818;color:#bbb;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}.icon-choice:hover,.icon-choice.active{border-color:var(--accent);color:var(--accent);background:#202600}.category-chip{display:inline-flex;align-items:center;gap:6px}.category-icon{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}.category-icon svg{width:100%;height:100%;display:block}
 .chart-wrap{width:100%;overflow:auto}.chart-svg{width:100%;min-width:620px;height:auto;display:block}.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.chart-legend span{font-size:12px;color:var(--muted)}.chart-legend b{color:var(--text)}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
-@media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
+.expense-table-wrap{width:100%;min-width:0}
+.card,.grid,header,.main,section{min-width:0}
+table{max-width:100%}
+td,th{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:900px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .app{width:100%;min-width:0}
+  .side{width:100%;min-width:0;overflow:hidden}
+  .main{width:100%;max-width:100%;min-width:0;margin:0;padding:16px}
+  header{align-items:flex-start;flex-wrap:wrap}
+  h1{font-size:28px}
+  .card{width:100%;max-width:100%;overflow:hidden}
+  .cloud-status{align-items:flex-start;flex-wrap:wrap}
+  .cloud-actions{width:100%}
+  .cloud-actions .btn{flex:1 1 auto}
+  .calendar-grid{min-width:680px}
+  .chart-svg{min-width:560px}
+  .expense-table{table-layout:fixed;width:100%}
+  .expense-table th,.expense-table td{font-size:12px;padding:8px 5px}
+}
+@media(max-width:600px){
+  .main{padding:12px}
+  header{gap:10px;margin-bottom:16px}
+  h1{font-size:24px}
+  h2{font-size:20px}
+  .sub{font-size:13px}
+  .nav{gap:5px;margin-top:20px;padding-bottom:2px}
+  .nav button{padding:10px 11px;font-size:13px}
+  .kpis{gap:10px}
+  .value{font-size:25px}
+  .expense-table thead{display:none}
+  .expense-table,.expense-table tbody,.expense-table tr,.expense-table td{display:block;width:100%}
+  .expense-table tr{background:#181818;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:9px}
+  .expense-table td{border:0;padding:5px 2px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;text-align:right}
+  .expense-table td::before{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.07em;text-align:left;flex:0 0 72px}
+  .expense-table td:nth-child(1)::before{content:"Data"}
+  .expense-table td:nth-child(2)::before{content:"Descrizione"}
+  .expense-table td:nth-child(3)::before{content:"Categoria"}
+  .expense-table td:nth-child(4)::before{content:"Importo"}
+  .expense-table td:nth-child(5)::before{content:"Scadenza"}
+  .expense-table td:nth-child(6)::before{content:""}
+  .expense-table td:nth-child(6){justify-content:flex-end;padding-top:8px}
+  .expense-table .pill{white-space:normal}
+  .expense-table .deadline-soon,.expense-table .deadline-overdue,.expense-table .deadline-normal{max-width:65%;text-align:right}
+  .expense-table .btn{flex:none}
+  .formgrid{gap:9px}
+  .formgrid input,.formgrid select,.formgrid button{min-width:0}
+}@media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
 </style></head><body><div class="app">
 <aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
 <nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('calendar',this)">Calendario</button><button onclick="view('predictions',this)">Previsioni</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
@@ -47,7 +94,7 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <label style="display:flex;align-items:center;gap:10px;margin-top:14px;cursor:pointer"><input id="repeatMonthly" type="checkbox" style="width:auto;accent-color:var(--accent)"> <span><strong>Ripeti ogni mese</strong><span class="small" style="display:block;margin-top:3px">Il prossimo mese questa stessa spesa verrà inserita automaticamente nello stesso giorno.</span></span></label>
 <div class="small" style="margin-top:9px">Se inserisci una <strong>Scadenza</strong>, Budget Reset avvierà il countdown e ti avviserà quando mancano 5 giorni.</div></div>
 <div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Mese corrente</div><div id="expenseMonthTitle" class="value" style="font-size:21px">—</div></div><span id="expenseMonthTotal" class="pill green">€0</span></div>
-<table style="margin-top:12px"><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th>Scadenza</th><th></th></tr></thead><tbody id="table"></tbody></table></div>
+<div class="expense-table-wrap"><table class="expense-table" style="margin-top:12px"><thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th>Scadenza</th><th></th></tr></thead><tbody id="table"></tbody></table></div></div>
 <div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Spese ricorrenti</div><div class="small">Queste voci vengono riproposte ogni mese, ma incidono sul totale solo nel mese di competenza.</div></div><span id="recurringCount" class="pill">0</span></div><div id="recurringList" style="margin-top:12px"></div></div><div class="card" style="margin-top:15px"><div class="row"><div><div class="label">Categorie</div><h2>Personalizza le tue categorie</h2><div class="small">Crea nuove categorie e assegna un'icona. Le categorie personalizzate vengono sincronizzate con il tuo account.</div></div></div>
 <div class="formgrid" style="margin-top:14px"><input id="newCategoryName" placeholder="es. Animali"><button class="btn" onclick="addCategory()">+ Aggiungi categoria</button></div>
 <div style="margin-top:12px"><div class="small" style="margin-bottom:7px">Scegli icona</div><div id="categoryIconPicker" class="icon-picker"></div></div>
