@@ -16,11 +16,11 @@ button.btn{background:var(--accent);color:#111;border:0;border-radius:9px;paddin
 .view{display:none}.view.active{display:block}.pill{padding:4px 8px;border-radius:999px;background:#333;color:#bbb;font-size:12px}.pill.green{color:var(--accent);background:#303b14}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px;border-bottom:1px solid var(--line);font-size:14px}th{font-size:11px;color:#aaa;text-transform:uppercase}.empty{text-align:center;color:#777;padding:25px}
 .notice{border-left:3px solid var(--accent);padding:12px;background:#202600;border-radius:8px}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.chart-wrap{width:100%;overflow:auto}.chart-svg{width:100%;min-width:620px;height:auto;display:block}.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}.chart-legend span{font-size:12px;color:var(--muted)}.chart-legend b{color:var(--text)}.calendar-head{color:#aaa;text-align:center;font-size:11px;text-transform:uppercase;padding:7px}.calendar-day{min-height:110px;background:#181818;border:1px solid var(--line);border-radius:10px;padding:7px;overflow:hidden}.calendar-day.muted{opacity:.45}.calendar-day.today{border-color:var(--accent)}.calendar-day-number{font-weight:800;font-size:13px;margin-bottom:6px}.calendar-event{font-size:11px;padding:5px 6px;border-radius:6px;background:#303030;margin-top:4px;cursor:pointer}.calendar-event.paid{background:#303b14;color:var(--accent)}.calendar-event.rate{border-left:2px solid var(--accent)}.calendar-event.recurring{border-left:2px solid #aaa}.calendar-event.scheduled{border-left:2px solid #6f8cff}.calendar-event.income{border-left:2px solid var(--accent);color:var(--accent)}.calendar-amount{font-weight:800}.calendar-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}.calendar-actions .btn{padding:5px 8px;font-size:11px}.cloud-card{margin-bottom:15px}.cloud-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.cloud-actions{display:flex;gap:8px;flex-wrap:wrap}.cloud-actions input{max-width:220px}.cloud-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#888;margin-right:7px}.cloud-dot.on{background:var(--accent)}.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}.modal-backdrop.show{display:flex}.modal{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;width:min(460px,100%)}.modal h2{margin-top:0}.modal .grid{gap:10px}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:32px;border:0;border-radius:7px;background:#333;color:#fff;cursor:pointer;font-size:16px}
 @media(max-width:900px){.app{display:block}.side{position:static;width:100%;height:auto;border:0;border-bottom:1px solid var(--line)}.main{margin:0;width:100%;padding:20px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap}.kpis,.two,.three,.formgrid{grid-template-columns:1fr}}
 </style></head><body><div class="app">
 <aside class="side"><div class="logo">BUDGET <span>RESET</span></div><div class="small">Sistema di budgeting semplice per single</div>
-<nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('calendar',this)">Calendario</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
+<nav class="nav"><button class="active" onclick="view('dash',this)">Dashboard</button><button onclick="view('expenses',this)">Spese</button><button onclick="view('installments',this)">Rate</button><button onclick="view('calendar',this)">Calendario</button><button onclick="view('predictions',this)">Previsioni</button><button onclick="view('goals',this)">Obiettivi</button><button onclick="view('review',this)">Review</button></nav></aside>
 <main class="main">
 <section id="dash" class="view active"><div class="card cloud-card"><div class="cloud-status"><div><div class="label">I TUOI DATI</div><div id="cloudText"><span class="cloud-dot"></span>Accesso non effettuato</div></div><div class="cloud-actions"><button id="accountBtn" class="btn" onclick="openAuth()">Account</button><button id="logoutBtn" class="btn danger" style="display:none" onclick="cloudLogout()">Logout</button></div></div></div><header><div><h1>Il tuo denaro, finalmente, senza fogli complicati.</h1><div class="sub">Capire → decidere → migliorare.</div></div><div style="display:flex;gap:8px;align-items:center"><label class="small" for="dashboardMonth">Mese</label><input id="dashboardMonth" type="month" style="width:150px" onchange="changeDashboardMonth()"><button class="btn secondary" onclick="resetData()">Reset</button></div></header>
 <div class="grid kpis"><div class="card"><div class="label">Entrate</div><div id="inc" class="value">€0</div></div><div class="card"><div class="label">Spese</div><div id="exp" class="value">€0</div><div id="expRate" class="small" style="margin-top:5px">Incluse rate: €0</div></div><div class="card"><div class="label">Disponibile</div><div id="avail" class="value accent">€0</div></div><div class="card"><div class="label">Risparmio</div><div id="rate" class="value">0%</div></div></div>
@@ -67,6 +67,12 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:11px 7px
 <div class="card" style="margin-top:15px"><div id="calendarGrid" class="calendar-grid"></div></div>
 <div class="card" style="margin-top:15px"><div class="label">Scadenze del mese</div><div id="calendarList" style="margin-top:10px"></div></div></section>
 
+<section id="predictions" class="view"><header><div><h1>Previsioni</h1><div class="sub">Sai già quanto spenderai, come potrebbe finire il mese e cosa aspettarti nei prossimi mesi.</div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn secondary" onclick="predictionPrev()">←</button><input id="predictionMonth" type="month" style="width:150px" onchange="changePredictionMonth()"><button class="btn secondary" onclick="predictionNext()">→</button></div></header>
+<div class="card"><div class="notice"><strong>Come viene calcolata la previsione</strong><br><span id="predictionMethod" class="small">Usiamo i tuoi mesi completi disponibili per stimare la spesa variabile e aggiungiamo rate, scadenze e spese ricorrenti già conosciute.</span></div></div>
+<div id="predictionKpis" class="grid three" style="margin-top:15px"></div>
+<div class="grid two" style="margin-top:15px"><div class="card"><div class="label">Andamento spese</div><h2>Storico + previsione</h2><div id="spendChart" style="margin-top:10px"></div></div><div class="card"><div class="label">Saldo a fine mese</div><h2>Effettivo + previsto</h2><div id="balanceChart" style="margin-top:10px"></div></div></div>
+<div class="card" style="margin-top:15px"><div class="label">Prossimi 6 mesi</div><div id="predictionTable" style="margin-top:10px;overflow:auto"></div></div></section>
+
 <section id="review" class="view"><header><div><h1>Review settimanale</h1><div class="sub">5 minuti per decidere la prossima settimana.</div></div></header>
 <div class="card"><div class="grid"><input id="q1" placeholder="Quale spesa ti ha sorpreso?"><input id="q2" placeholder="Cosa potresti ridurre senza sacrifici?"><select id="q3"><option>Sono dentro il budget</option><option>Sono quasi dentro</option><option>Sono oltre il budget</option></select><input id="q4" placeholder="Priorità della prossima settimana"><input id="q5" placeholder="Una azione entro 24 ore"><button class="btn" onclick="saveReview()">Salva review</button><div id="saved" class="notice" style="display:none">Review salvata. Hai una prossima azione.</div></div></div></section>
 </main></div>
@@ -88,6 +94,7 @@ const save=()=>{localStorage.setItem(KEY,JSON.stringify(d));render();if(window.B
 function localDateKey(dt){const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),day=String(dt.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
 function todayKey(){return localDateKey(new Date())}
 let dashboardMonth=monthKey(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-01');
+let predictionMonth=dashboardMonth;
 let calendarMonth=dashboardMonth;
 function ensureMonthlyData(){
   const current=monthKey(todayKey());
@@ -333,6 +340,88 @@ function deleteScheduled(id){
 function calendarPrev(){calendarMonth=shiftMonth(calendarMonth,-1);syncCalendarControls();render()}
 function calendarNext(){calendarMonth=shiftMonth(calendarMonth,1);syncCalendarControls();render()}
 function changeCalendarMonth(){calendarMonth=document.getElementById('calendarMonth').value||monthKey(todayKey());render()}
+function predictionPrev(){predictionMonth=shiftMonth(predictionMonth,-1);renderPredictions()}
+function predictionNext(){predictionMonth=shiftMonth(predictionMonth,1);renderPredictions()}
+function changePredictionMonth(){predictionMonth=document.getElementById('predictionMonth').value||monthKey(todayKey());renderPredictions()}
+function monthDiff(a,b){const ap=a.split('-').map(Number),bp=b.split('-').map(Number);return (bp[0]-ap[0])*12+(bp[1]-ap[1])}
+function historicalCompleteMonths(count=6){
+  const current=monthKey(todayKey()),months=[];
+  for(let i=count;i>=1;i--){const m=shiftMonth(current,-i);months.push(m)}
+  return months;
+}
+function mean(values){return values.length?values.reduce((s,x)=>s+x,0)/values.length:0}
+function stdDev(values){
+  if(values.length<2)return 0;
+  const m=mean(values);return Math.sqrt(mean(values.map(x=>(x-m)**2)));
+}
+function monthPlannedAmounts(month){
+  const recurring=recurringExpectedForMonth(month).filter(x=>!x.recorded).reduce((s,x)=>s+x.amount,0);
+  const scheduled=scheduledExpectedForMonth(month).filter(x=>!x.paid).reduce((s,x)=>s+x.amount,0);
+  const rates=rateExpectedForMonth(month).filter(x=>!x.paid).reduce((s,x)=>s+x.amount,0);
+  return recurring+scheduled+rates;
+}
+function monthlyActual(month){return monthExpensesFor(month).reduce((s,x)=>s+(Number(x.a)||0),0)}
+function monthlyVariableActual(month){
+  return monthExpensesFor(month).filter(x=>!x.recurringKey&&!x.rateKey&&!x.scheduledKey).reduce((s,x)=>s+(Number(x.a)||0),0)
+}
+function forecastMonth(month){
+  const hist=historicalCompleteMonths(6),vars=hist.map(monthlyVariableActual).filter((x,i)=>monthExpensesFor(hist[i]).length||x>0);
+  const varAvg=mean(vars),error=stdDev(vars);
+  const planned=monthPlannedAmounts(month),actual=monthlyActual(month),income=getMonthlyAmount(d.incomes,month);
+  const isCurrent=month===monthKey(todayKey());
+  let variableForecast=varAvg;
+  if(isCurrent){
+    const day=new Date().getDate(),daysInMonth=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
+    variableForecast=day>0?Math.max(monthlyVariableActual(month),varAvg):varAvg;
+  }
+  const spendForecast=Math.max(actual,variableForecast+planned);
+  const forecastBalance=income-spendForecast;
+  const lower=Math.max(0,spendForecast-error),upper=spendForecast+error;
+  return {month,actual,income,planned,variableForecast,spendForecast,error,lower,upper,forecastBalance,completeHistory:vars.length};
+}
+function svgBarLine(data,valueKey,errorKey,title,accentLabel){
+  const w=700,h=300,pad={l:45,r:20,t:25,b:48},innerW=w-pad.l-pad.r,innerH=h-pad.t-pad.b;
+  const vals=data.map(x=>Number(x[valueKey])||0),errs=data.map(x=>Number(x[errorKey])||0);
+  const max=Math.max(1,...vals.map((v,i)=>v+errs[i]));
+  const x=i=>pad.l+(i/(Math.max(1,data.length-1)))*innerW;
+  const y=v=>pad.t+innerH-(v/max)*innerH;
+  let svg='<svg class="chart-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+title+'"><line x1="'+pad.l+'" y1="'+(pad.t+innerH)+'" x2="'+(w-pad.r)+'" y2="'+(pad.t+innerH)+'" stroke="#383838"/><line x1="'+pad.l+'" y1="'+pad.t+'" x2="'+pad.l+'" y2="'+(pad.t+innerH)+'" stroke="#383838"/>';
+  [0,.5,1].forEach(t=>{const yy=pad.t+innerH*(1-t);svg+='<text x="4" y="'+(yy+4)+'" fill="#888" font-size="11">'+eur(max*t)+'</text>';});
+  data.forEach((d,i)=>{const px=x(i),val=vals[i],top=y(val+errs[i]),bot=y(Math.max(0,val-errs[i]));svg+='<line x1="'+px+'" y1="'+top+'" x2="'+px+'" y2="'+bot+'" stroke="#C8F135" stroke-width="4" opacity=".35"/>';svg+='<circle cx="'+px+'" cy="'+y(val)+'" r="5" fill="#C8F135"/>';svg+='<text x="'+px+'" y="'+(h-22)+'" text-anchor="middle" fill="#888" font-size="11">'+d.label+'</text>';if(i>0){const prev=data[i-1];svg+='<line x1="'+x(i-1)+'" y1="'+y(vals[i-1])+'" x2="'+px+'" y2="'+y(val)+'" stroke="#C8F135" stroke-width="2"/>';}});
+  svg+='</svg><div class="chart-legend"><span><b>●</b> '+accentLabel+'</span><span><b>│</b> fascia di errore calcolata sui dati disponibili</span></div>';
+  return svg;
+}
+function svgBars(data,valueKey,title){
+  const w=700,h=300,pad={l:45,r:20,t:25,b:48},innerW=w-pad.l-pad.r,innerH=h-pad.t-pad.b,max=Math.max(1,...data.map(x=>Math.abs(Number(x[valueKey])||0))),barW=Math.min(55,innerW/data.length*.55);
+  const xStep=innerW/data.length;let svg='<svg class="chart-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+title+'"><line x1="'+pad.l+'" y1="'+(pad.t+innerH/2)+'" x2="'+(w-pad.r)+'" y2="'+(pad.t+innerH/2)+'" stroke="#383838"/>';
+  data.forEach((d,i)=>{const v=Number(d[valueKey])||0,bh=Math.abs(v)/max*(innerH/2-8),x=pad.l+i*xStep+(xStep-barW)/2,base=pad.t+innerH/2,y=v>=0?base-bh:base;svg+='<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+bh+'" rx="6" fill="#C8F135" opacity="'+(v>=0?'.75':'.35')+'"/><text x="'+(x+barW/2)+'" y="'+(h-22)+'" text-anchor="middle" fill="#888" font-size="11">'+d.label+'</text>';});svg+='</svg><div class="chart-legend"><span><b>●</b> saldo previsto a fine mese</span></div>';return svg;
+}
+function renderPredictions(){
+  const control=document.getElementById('predictionMonth');if(control)control.value=predictionMonth;
+  const months=[shiftMonth(predictionMonth,-5),shiftMonth(predictionMonth,-4),shiftMonth(predictionMonth,-3),shiftMonth(predictionMonth,-2),shiftMonth(predictionMonth,-1),predictionMonth,shiftMonth(predictionMonth,1),shiftMonth(predictionMonth,2),shiftMonth(predictionMonth,3),shiftMonth(predictionMonth,4),shiftMonth(predictionMonth,5)];
+  const nowMonth=monthKey(todayKey());
+  const histMonths=months.filter(m=>m<=nowMonth),futureMonths=months.filter(m=>m>=predictionMonth);
+  const histData=histMonths.map(m=>({month:m,label:monthLabelShort(m),value:monthlyActual(m)}));
+  const forecast=months.filter(m=>m>=nowMonth).map(forecastMonth);
+  const chartData=[...histData.map(x=>({label:x.label,value:x.value,error:0})),...forecast.map(x=>({label:monthLabelShort(x.month),value:x.spendForecast,error:x.error}))];
+  const balanceData=forecast.slice(0,6).map(x=>({label:monthLabelShort(x.month),balance:x.forecastBalance}));
+  const selected=forecastMonth(predictionMonth);
+  const firstFuture=forecast.find(x=>x.month>=nowMonth)||selected;
+  const k=document.getElementById('predictionKpis');
+  if(k){
+    k.innerHTML='<div class="card"><div class="label">Spesa prevista</div><div class="value accent">'+eur(selected.spendForecast)+'</div><div class="small">Fascia: '+eur(selected.lower)+' – '+eur(selected.upper)+'</div></div>'+
+      '<div class="card"><div class="label">Saldo previsto</div><div class="value">'+eur(selected.forecastBalance)+'</div><div class="small">Entrata '+eur(selected.income)+' − spesa prevista</div></div>'+
+      '<div class="card"><div class="label">Impegni già conosciuti</div><div class="value">'+eur(selected.planned)+'</div><div class="small">'+selected.completeHistory+' mesi completi disponibili per stimare la parte variabile.</div></div>';
+  }
+  const method=document.getElementById('predictionMethod');
+  if(method)method.textContent=selected.completeHistory>=2?'Media della spesa variabile degli ultimi '+selected.completeHistory+' mesi completi + impegni già noti. Fascia di errore = deviazione standard della spesa variabile osservata.':'Dati storici insufficienti: la previsione è provvisoria e la fascia di errore è in costruzione.';
+  const sc=document.getElementById('spendChart');if(sc)sc.innerHTML=svgBarLine(chartData,'value','error','Andamento storico e previsione','spesa mensile');
+  const bc=document.getElementById('balanceChart');if(bc)bc.innerHTML=svgBars(balanceData,'balance','Saldo previsto a fine mese');
+  const table=document.getElementById('predictionTable');
+  const rows=forecast.slice(0,6).map(x=>'<tr><td>'+monthLabelLong(x.month)+'</td><td>'+eur(x.income)+'</td><td>'+eur(x.spendForecast)+'</td><td>'+eur(x.lower)+' – '+eur(x.upper)+'</td><td>'+eur(x.forecastBalance)+'</td></tr>').join('');
+  if(table)table.innerHTML='<table><thead><tr><th>Mese</th><th>Entrate</th><th>Spesa prevista</th><th>Fascia</th><th>Saldo previsto</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function monthLabelShort(month){const p=month.split('-');return new Intl.DateTimeFormat('it-IT',{month:'short',year:'2-digit'}).format(new Date(Number(p[0]),Number(p[1])-1,1)).replace('.','')}
 function useCalendarMonthInDashboard(){dashboardMonth=calendarMonth;view('dash',document.querySelector('.nav button'));}
 function shiftMonth(month,delta){const p=month.split('-').map(Number),dt=new Date(p[0],p[1]-1+delta,1);return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')}
 function syncCalendarControls(){
@@ -452,6 +541,7 @@ function render(){
   document.getElementById('instNext').textContent=dashboardNextRate?eur(dashboardNextRate.amount):'—';document.getElementById('instNextText').textContent=dashboardNextRate?dashboardNextRate.debt.name+' · rata '+dashboardNextRate.n+'/'+dashboardNextRate.debt.count+' · '+formatDate(dashboardNextRate.due)+' · intervallo 30 giorni':'Nessuna rata futura.';
   renderInstallments();
   renderCalendar();
+  renderPredictions();
 }
 initExpenseForm();initInstallmentForm();repairClosedInstallments();syncCalendarControls();render();
 </script><div id="authModal" class="modal-backdrop" onclick="if(event.target===this)closeAuth()"><div class="modal"><div class="row"><h2 id="authTitle">Account</h2><button class="btn secondary" onclick="closeAuth()">Chiudi</button></div><div id="authGuest"><div class="small" style="margin-bottom:15px">Crea un account gratuito per usare Budget Reset su più dispositivi.</div><div class="grid"><input id="authEmail" type="email" placeholder="La tua email"><div class="password-wrap"><input id="authPassword" type="password" placeholder="Password (min. 6 caratteri)" autocomplete="current-password"><button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Mostra password">◉</button></div><div class="cloud-actions"><button class="btn" onclick="cloudCreate()">Crea account</button><button class="btn secondary" onclick="cloudLogin()">Accedi</button><button class="btn secondary" onclick="cloudResetPassword()">Password dimenticata</button></div></div></div><div id="authUser" style="display:none"><div class="notice"><strong>Account attivo</strong><br><span id="authUserEmail" class="small"></span></div><button class="btn danger" style="margin-top:15px" onclick="cloudLogout()">Logout</button></div><div id="authMsg" class="small" style="margin-top:12px"></div></div></div><script type="module">
