@@ -322,7 +322,7 @@ function renderCalendar(){
       return '<div class="calendar-event '+ev.type+paid+'" title="'+safeTitle+'">'+safeTitle+'<div class="calendar-amount">'+eur(ev.amount)+'</div>'+((ev.type==='scheduled'&&!ev.paid)?'<div class="calendar-actions"><button class="btn" onclick="markScheduledPaid(\''+ev.item.id+'\',\''+ev.date+'\')">Segna pagata</button></div>':'')+'</div>';
     }).join('')+(dayEvents.length>5?'<div class="small">+'+(dayEvents.length-5)+' altro</div>':'')+'</div>';
   }
-  while((offset+daysInMonth)%7!==0){cells+='<div class="calendar-day muted"></div>';if((offset+daysInMonth)%7===0)break;daysInMonth++}
+  const totalCells=offset+daysInMonth;for(let cell=totalCells;cell%7!==0;cell++)cells+='<div class="calendar-day muted"></div>';
   grid.innerHTML=cells;
   const scheduled=events.filter(x=>x.type==='scheduled'),monthActual=d.expenses.filter(x=>monthKey(x.date||x.due||'')===calendarMonth).reduce((s,x)=>s+x.a,0),planned=events.filter(x=>x.type==='scheduled'&&x.paid===false).reduce((s,x)=>s+x.amount,0);
   summary.innerHTML='<div class="card"><div class="label">Spese effettive</div><div class="value">'+eur(monthActual)+'</div></div><div class="card"><div class="label">Scadenze programmate non pagate</div><div class="value accent">'+eur(planned)+'</div></div><div class="card"><div class="label">Eventi nel mese</div><div class="value">'+events.length+'</div></div>';
