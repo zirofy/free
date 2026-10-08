@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, linkWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { initializeFirestore, memoryLocalCache, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { firebaseConfig, firebaseConfigured } from "./firebase-config.js";
 
@@ -152,10 +152,53 @@ async function save(data){
     throw new Error(message);
   }
 }
+let pendingGoogleCredential=null;
+
+async function signInWithGoogle(){
+  if(!auth)throw new Error("Firebase non è ancora configurato.");
+  const provider=new GoogleAuthProvider();
+  provider.setCustomParameters({prompt:"select_account"});
+  try{
+    if(window.matchMedia&&window.matchMedia("(max-width: 768px)").matches){
+      await signInWithRedirect(auth,provider);
+      return {redirect:true};
+    }
+    return await signInWithPopup(auth,provider);
+  }catch(error){
+    const code=error?.code||"";
+    if(code==="auth/account-exists-with-different-credential"){
+      try{pendingGoogleCredential=GoogleAuthProvider.credentialFromError(error)}catch{pendingGoogleCredential=null}
+      throw new Error("Esiste già un account Budget Reset con questa email. Accedi con email e password per collegare Google.");
+    }
+    throw error;
+  }
+}
+async function finishGoogleLinkWithPassword(email,password){
+  if(!auth||!pendingGoogleCredential)throw new Error("Nessun collegamento Google in sospeso.");
+  const cred=await signInWithEmailAndPassword(auth,email,password);
+  await linkWithCredential(cred.user,pendingGoogleCredential);
+  pendingGoogleCredential=null;
+  return cred;
+}
+async function handleGoogleRedirectResult(){
+  await ready;
+  if(!auth)return;
+  try{
+    const result=await getRedirectResult(auth);
+    if(result?.user)dispatch("brcloud:google-login",{user:{uid:result.user.uid,email:result.user.email},redirect:true});
+  }catch(error){
+    const code=error?.code||"";
+    if(code==="auth/account-exists-with-different-credential"){
+      try{pendingGoogleCredential=GoogleAuthProvider.credentialFromError(error)}catch{pendingGoogleCredential=null}
+    }
+    dispatch("brcloud:google-error",{code,message:error?.message||"Accesso Google non riuscito"});
+  }
+}
+
 async function signUp(email,password){if(!auth)throw new Error("Firebase non è ancora configurato.");return createUserWithEmailAndPassword(auth,email,password)}
 async function signIn(email,password){if(!auth)throw new Error("Firebase non è ancora configurato.");return signInWithEmailAndPassword(auth,email,password)}
 async function resetPassword(email){if(!auth)throw new Error("Firebase non è ancora configurato.");return sendPasswordResetEmail(auth,email)}
 async function logout(){if(auth)await signOut(auth)}
 async function migrateLocal(){const data=readLocal();await ready;if(!hasUsefulData(data))throw new Error("Non ci sono dati locali da importare.");await pushToCloud(data,"migration")}
-window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,resetPassword,logout,migrateLocal,save,syncNow,diagnose,getUser:()=>currentUser,whenReady:()=>ready};
-startCloud();
+window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,signInWithGoogle,finishGoogleLinkWithPassword,resetPassword,logout,migrateLocal,save,syncNow,diagnose,getUser:()=>currentUser,whenReady:()=>ready};
+startCloud().finally(()=>handleGoogleRedirectResult());
