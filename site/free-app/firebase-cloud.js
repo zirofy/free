@@ -153,6 +153,26 @@ async function save(data){
   }
 }
 let pendingGoogleCredential=null;
+const pendingGoogleKey="br_google_pending_credential";
+function storePendingGoogleCredential(credential){
+  pendingGoogleCredential=credential||null;
+  try{
+    if(credential){
+      sessionStorage.setItem(pendingGoogleKey,JSON.stringify({idToken:credential.idToken||null,accessToken:credential.accessToken||null}));
+    }else sessionStorage.removeItem(pendingGoogleKey);
+  }catch{}
+}
+function restorePendingGoogleCredential(){
+  try{
+    const raw=sessionStorage.getItem(pendingGoogleKey);if(!raw)return null;
+    const x=JSON.parse(raw);
+    if(x?.idToken||x?.accessToken){
+      pendingGoogleCredential=GoogleAuthProvider.credential(x.idToken||null,x.accessToken||null);
+      return pendingGoogleCredential;
+    }
+  }catch{}
+  return null;
+}
 
 async function signInWithGoogle(){
   if(!auth)throw new Error("Firebase non è ancora configurato.");
@@ -167,8 +187,14 @@ async function signInWithGoogle(){
   }catch(error){
     const code=error?.code||"";
     if(code==="auth/account-exists-with-different-credential"){
-      try{pendingGoogleCredential=GoogleAuthProvider.credentialFromError(error)}catch{pendingGoogleCredential=null}
+      try{storePendingGoogleCredential(GoogleAuthProvider.credentialFromError(error))}catch{storePendingGoogleCredential(null)}
       throw new Error("Esiste già un account Budget Reset con questa email. Accedi con email e password per collegare Google.");
+    }
+    if(code==="auth/operation-not-allowed"){
+      throw new Error("Google non è abilitato tra i metodi di accesso del progetto Firebase. Controlla Authentication → Metodo di accesso → Google e premi Salva.");
+    }
+    if(code==="auth/unauthorized-domain"){
+      throw new Error("Il dominio di Budget Reset non è autorizzato in Firebase Authentication. Aggiungi zirofy.app ai Domini autorizzati.");
     }
     throw error;
   }
@@ -177,19 +203,20 @@ async function finishGoogleLinkWithPassword(email,password){
   if(!auth||!pendingGoogleCredential)throw new Error("Nessun collegamento Google in sospeso.");
   const cred=await signInWithEmailAndPassword(auth,email,password);
   await linkWithCredential(cred.user,pendingGoogleCredential);
-  pendingGoogleCredential=null;
+  storePendingGoogleCredential(null);
   return cred;
 }
 async function handleGoogleRedirectResult(){
   await ready;
   if(!auth)return;
+  restorePendingGoogleCredential();
   try{
     const result=await getRedirectResult(auth);
     if(result?.user)dispatch("brcloud:google-login",{user:{uid:result.user.uid,email:result.user.email},redirect:true});
   }catch(error){
     const code=error?.code||"";
     if(code==="auth/account-exists-with-different-credential"){
-      try{pendingGoogleCredential=GoogleAuthProvider.credentialFromError(error)}catch{pendingGoogleCredential=null}
+      try{storePendingGoogleCredential(GoogleAuthProvider.credentialFromError(error))}catch{storePendingGoogleCredential(null)}
     }
     dispatch("brcloud:google-error",{code,message:error?.message||"Accesso Google non riuscito"});
   }
