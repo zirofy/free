@@ -151,8 +151,12 @@ td,th{overflow-wrap:anywhere;word-break:break-word}
 <div class="card"><div class="grid"><input id="q1" placeholder="Quale spesa ti ha sorpreso?"><input id="q2" placeholder="Cosa potresti ridurre senza sacrifici?"><select id="q3"><option>Sono dentro il budget</option><option>Sono quasi dentro</option><option>Sono oltre il budget</option></select><input id="q4" placeholder="Priorità della prossima settimana"><input id="q5" placeholder="Una azione entro 24 ore"><button class="btn" onclick="saveReview()">Salva review</button><div id="saved" class="notice" style="display:none">Review salvata. Hai una prossima azione.</div></div></div></section>
 </main></div>
 <script>
-const KEY="budget_reset_solo";
-let d=JSON.parse(localStorage.getItem(KEY)||'{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[],"recurringExpenses":[],"incomes":[],"budgets":[],"scheduled":[] }');
+const LEGACY_KEY="budget_reset_solo";
+const ACTIVE_UID_KEY="budget_reset_active_uid";
+const activeUid=sessionStorage.getItem(ACTIVE_UID_KEY)||"";
+const KEY=activeUid?("budget_reset_solo_"+activeUid):"budget_reset_locked";
+const EMPTY_DATA='{"income":0,"budget":0,"expenses":[],"goals":[],"splits":[],"emergency":{},"installments":[],"recurringExpenses":[],"incomes":[],"budgets":[],"scheduled":[] }';
+let d=JSON.parse(localStorage.getItem(KEY)||EMPTY_DATA);
 if(!Array.isArray(d.expenses))d.expenses=[];
 if(!Array.isArray(d.goals))d.goals=[];
 if(!Array.isArray(d.splits))d.splits=[];
@@ -448,7 +452,7 @@ function addGoal(){let n=document.getElementById('gn').value.trim(),f=document.g
 function updateGoal(i){let v=prompt('Quanto vuoi aggiungere al progresso?');let a=+v||0;if(a<=0)return;d.goals[i].s=Math.min(d.goals[i].t,d.goals[i].s+a);save()}
 function delGoal(i){if(confirm('Eliminare questo obiettivo?')){d.goals.splice(i,1);save()}}
 function saveReview(){document.getElementById('saved').style.display='block'}
-function resetData(){if(confirm('Cancellare i dati salvati?')){localStorage.removeItem(KEY);location.reload()}}
+function resetData(){if(confirm('Cancellare i dati salvati da questo account?')){localStorage.removeItem(KEY);location.reload()}}
 function saveEmergency(){d.emergency={target:+document.getElementById("em").value||0,months:+document.getElementById("emm").value||0};save()}
 function addInstallment(){
   const name=document.getElementById('iDesc').value.trim(), total=+document.getElementById('iTotal').value||0, count=+document.getElementById('iCount').value||3, first=document.getElementById('iDate').value||todayKey();
@@ -759,19 +763,30 @@ window.addEventListener("brcloud:status",e=>{
   if(btn)btn.textContent=u?"Account attivo":"Account";
   if(logoutBtn)logoutBtn.style.display=u?"inline-block":"none";
   if(u){
-    if(app)app.classList.remove("auth-locked");if(gate)gate.classList.remove("show");if(form)form.style.display="none";if(loading)loading.style.display="none";if(lead)lead.textContent="Account collegato.";if(email)email.textContent=u.email||"";
+    // Keep the app locked until Firebase has loaded this exact user's data.
+    if(app)app.classList.add("auth-locked");if(gate)gate.classList.add("show");if(form)form.style.display="none";if(loading)loading.style.display="block";if(lead)lead.textContent="Caricamento dei tuoi dati…";if(email)email.textContent=u.email||"";
   }else{
+    sessionStorage.removeItem("budget_reset_active_uid");
     if(app)app.classList.add("auth-locked");if(gate)gate.classList.add("show");if(form)form.style.display="grid";if(loading)loading.style.display="none";if(lead)lead.textContent="Accedi per usare Budget Reset su tutti i tuoi dispositivi.";
   }
 });
-window.addEventListener("brcloud:loaded",e=>{
-  const data=e.detail.data;if(!data)return;
+window.addEventListener("brcloud:session-data",e=>{
+  const uid=e.detail.uid,data=e.detail.data;
+  if(!uid||!data)return;
+  const key="budget_reset_solo_"+uid,incoming=JSON.stringify(data);
   try{
-    const incoming=JSON.stringify(data),current=localStorage.getItem("budget_reset_solo");
-    if(incoming===current)return;
-    localStorage.setItem("budget_reset_solo",incoming);
-    location.reload();
-  }catch(err){console.warn("Cloud load:",err)}
+    const previousUid=sessionStorage.getItem("budget_reset_active_uid")||"";
+    const current=localStorage.getItem(key);
+    sessionStorage.setItem("budget_reset_active_uid",uid);
+    if(previousUid!==uid||current!==incoming){
+      localStorage.setItem(key,incoming);
+      location.reload();
+      return;
+    }
+    const app=document.querySelector(".app"),gate=document.getElementById("authScreen");
+    if(app)app.classList.remove("auth-locked");
+    if(gate)gate.classList.remove("show");
+  }catch(err){console.warn("Cloud session:",err)}
 });
 window.addEventListener("brcloud:sync",e=>{
   const el=document.getElementById("cloudText");if(!el)return;
@@ -790,7 +805,7 @@ async function cloudLogin(){try{const e=document.getElementById("authEmail").val
 async function cloudResetPassword(){try{const e=document.getElementById("authEmail").value.trim();if(!e)throw new Error("Inserisci prima la tua email.");await BRCloud.resetPassword(e);document.getElementById("authMsg").textContent="Email per reimpostare la password inviata."}catch(err){document.getElementById("authMsg").textContent=err.message}}
 async function cloudGoogle(){try{document.getElementById("authMsg").textContent="Accesso con Google in corso…";const r=await BRCloud.signInWithGoogle();if(r?.redirect)document.getElementById("authMsg").textContent="Reindirizzamento a Google…";else closeAuth()}catch(err){document.getElementById("authMsg").textContent=err.message;if((err.message||"").includes("collegare Google"))document.getElementById("googleLinkHelp").style.display="block"}}
 async function cloudLinkGoogle(){try{const e=document.getElementById("authEmail").value.trim(),p=document.getElementById("authPassword").value;if(!e||!p)throw new Error("Inserisci email e password del tuo account Budget Reset.");await BRCloud.finishGoogleLinkWithPassword(e,p);document.getElementById("googleLinkHelp").style.display="none";closeAuth()}catch(err){document.getElementById("authMsg").textContent=err.message}}
-async function cloudLogout(){try{await BRCloud.logout()}catch(err){const msg=document.getElementById("authMsg");if(msg)msg.textContent=err.message}}
+async function cloudLogout(){try{sessionStorage.removeItem("budget_reset_active_uid");await BRCloud.logout()}catch(err){const msg=document.getElementById("authMsg");if(msg)msg.textContent=err.message}}
 function togglePassword(){const input=document.getElementById("authPassword"),button=document.querySelector(".password-toggle");if(!input)return;const show=input.type==="password";input.type=show?"text":"password";if(button){button.textContent=show?"◉":"●";button.setAttribute("aria-label",show?"Nascondi password":"Mostra password")}}
 window.openAuth=openAuth;window.closeAuth=closeAuth;window.cloudCreate=cloudCreate;window.cloudLogin=cloudLogin;window.cloudGoogle=cloudGoogle;window.cloudLinkGoogle=cloudLinkGoogle;window.cloudResetPassword=cloudResetPassword;window.cloudLogout=cloudLogout;window.togglePassword=togglePassword;
 </script></body></html>
