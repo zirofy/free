@@ -7,7 +7,36 @@
 <meta name="description" content="Budget Reset ti aiuta a capire quanto puoi davvero spendere, organizzare le tue spese e costruire un margine ogni mese. Gratis.">
 <meta name="theme-color" content="#111111">
 <link rel="stylesheet" href="style.css">
-</head>
+<style>
+.cookie-banner{position:fixed;left:18px;right:18px;bottom:18px;z-index:9999;background:#232323;color:#fff;border:1px solid #4a4a4a;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.4);padding:20px;max-width:980px;margin:auto}
+.cookie-banner-inner{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}
+.cookie-title{font-size:18px;font-weight:850;margin:0 0 7px}
+.cookie-text{margin:0;color:#b9b9b9;font-size:13px;line-height:1.55}
+.cookie-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.cookie-actions .btn{min-width:132px}
+.cookie-secondary{background:#333!important;color:#fff!important}
+.cookie-close{position:absolute;right:10px;top:8px;width:34px;height:34px;border:0;border-radius:8px;background:#333;color:#fff;cursor:pointer;font-size:18px}
+.cookie-preferences{display:none;margin-top:15px;padding-top:15px;border-top:1px solid #383838}
+.cookie-preferences.show{display:block}
+.cookie-option{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:12px 0;border-bottom:1px solid #383838}
+.cookie-option:last-child{border-bottom:0}
+.cookie-switch{position:relative;width:48px;height:26px;flex:none}
+.cookie-switch input{opacity:0;width:0;height:0}
+.cookie-slider{position:absolute;inset:0;background:#444;border-radius:999px;cursor:pointer}
+.cookie-slider:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s}
+.cookie-switch input:checked + .cookie-slider{background:#C8F135}
+.cookie-switch input:checked + .cookie-slider:before{transform:translateX(22px);background:#111}
+.cookie-necessary{color:#C8F135;font-size:12px;font-weight:800}
+.cookie-link{color:#C8F135}
+@media(max-width:700px){
+  .cookie-banner{left:10px;right:10px;bottom:10px;padding:17px}
+  .cookie-banner-inner{grid-template-columns:1fr;gap:13px}
+  .cookie-actions{justify-content:stretch}
+  .cookie-actions .btn{flex:1 1 100%;min-width:0}
+  .cookie-title{font-size:16px}
+  .cookie-text{font-size:12px}
+}
+</style></head>
 <body>
 <div class="announcement">BUDGET RESET <span>•</span> IL TUO PRIMO RESET È GRATIS</div>
 <div class="wrap">
@@ -114,5 +143,85 @@ form.addEventListener("submit",async function(e){e.preventDefault();const status
 })();
 </script>
 <script src="tracking.js"></script>
-</body>
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookieTitle" aria-describedby="cookieText" hidden>
+  <button id="cookieClose" class="cookie-close" type="button" aria-label="Rifiuta i cookie non necessari">×</button>
+  <div class="cookie-banner-inner">
+    <div>
+      <h2 id="cookieTitle" class="cookie-title">La tua privacy conta</h2>
+      <p id="cookieText" class="cookie-text">Utilizziamo strumenti tecnici necessari al funzionamento del sito. Con il tuo consenso possiamo usare anche strumenti di misurazione per capire come viene utilizzata la landing e migliorare il servizio. Puoi accettare, rifiutare o personalizzare le tue scelte. <a class="cookie-link" href="/privacy.html#cookie">Leggi l'informativa</a>.</p>
+      <div id="cookiePreferences" class="cookie-preferences">
+        <div class="cookie-option">
+          <div><strong>Necessari</strong><div class="cookie-text">Servono al funzionamento del sito e alla memorizzazione delle tue preferenze.</div></div>
+          <span class="cookie-necessary">SEMPRE ATTIVI</span>
+        </div>
+        <div class="cookie-option">
+          <div><strong>Misurazione e analytics</strong><div class="cookie-text">Utilizzati, solo con consenso, per misurare l'efficacia della landing e delle campagne.</div></div>
+          <label class="cookie-switch" aria-label="Abilita misurazione e analytics"><input id="cookieAnalytics" type="checkbox"><span class="cookie-slider"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookieReject" type="button" class="btn cookie-secondary">Rifiuta</button>
+      <button id="cookieCustomize" type="button" class="btn cookie-secondary">Personalizza</button>
+      <button id="cookieAccept" type="button" class="btn">Accetta tutto</button>
+      <button id="cookieSave" type="button" class="btn" style="display:none">Salva preferenze</button>
+    </div>
+  </div>
+</div><script>
+(function(){
+  const KEY="budget_reset_cookie_consent";
+  const MAX_AGE=60*60*24*180;
+  const banner=document.getElementById("cookieBanner");
+  const prefs=document.getElementById("cookiePreferences");
+  const analytics=document.getElementById("cookieAnalytics");
+  const accept=document.getElementById("cookieAccept");
+  const reject=document.getElementById("cookieReject");
+  const customize=document.getElementById("cookieCustomize");
+  const save=document.getElementById("cookieSave");
+  const close=document.getElementById("cookieClose");
+  if(!banner)return;
+  function readConsent(){
+    try{
+      const raw=localStorage.getItem(KEY);
+      if(raw)return JSON.parse(raw);
+    }catch(e){}
+    const match=document.cookie.match(/(?:^|; )BudgetResetCookieConsent=([^;]*)/);
+    if(match){try{return JSON.parse(decodeURIComponent(match[1]))}catch(e){}}
+    return null;
+  }
+  function applyConsent(data){
+    const state={necessary:true,analytics:!!data.analytics,updatedAt:new Date().toISOString()};
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+    document.cookie="BudgetResetCookieConsent="+encodeURIComponent(JSON.stringify(state))+"; Max-Age="+MAX_AGE+"; Path=/; SameSite=Lax";
+    banner.hidden=true;
+    window.dispatchEvent(new CustomEvent("br:cookie-consent",{detail:state}));
+  }
+  window.BRConsent={
+    analyticsGranted:function(){
+      const c=readConsent();
+      return !!(c&&c.analytics);
+    },
+    open:function(){
+      banner.hidden=false;
+      prefs.classList.add("show");
+      analytics.checked=this.analyticsGranted();
+    }
+  };
+  const current=readConsent();
+  if(!current){banner.hidden=false;}
+  accept.addEventListener("click",()=>applyConsent({analytics:true}));
+  reject.addEventListener("click",()=>applyConsent({analytics:false}));
+  close.addEventListener("click",()=>applyConsent({analytics:false}));
+  customize.addEventListener("click",()=>{
+    prefs.classList.toggle("show");
+    save.style.display=prefs.classList.contains("show")?"inline-flex":"none";
+    customize.style.display=prefs.classList.contains("show")?"none":"inline-flex";
+  });
+  save.addEventListener("click",()=>applyConsent({analytics:analytics.checked}));
+  const cookieLink=document.querySelector('.footer-links a[href="/privacy.html"] + a');
+  if(cookieLink){
+    cookieLink.addEventListener("click",function(e){e.preventDefault();window.BRConsent.open()});
+  }
+})();
+</script></body>
 </html>
