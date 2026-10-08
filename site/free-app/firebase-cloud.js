@@ -4,11 +4,13 @@ import { initializeFirestore, memoryLocalCache, persistentLocalCache, persistent
 import { firebaseConfig, firebaseConfigured } from "./firebase-config.js";
 
 const dispatch=(name,detail={})=>window.dispatchEvent(new CustomEvent(name,{detail}));
-const localKey="budget_reset_solo";
+const legacyLocalKey="budget_reset_solo";
+function userLocalKey(uid){return "budget_reset_solo_"+uid}
+
 let auth=null,db=null,unsubscribe=null,currentUser=null,readyResolve=null;
 const ready=new Promise(resolve=>{readyResolve=resolve});
 
-function readLocal(){try{return JSON.parse(localStorage.getItem(localKey)||"{}")}catch{return {}}}
+function readLocal(uid=currentUser?.uid){try{const key=uid?userLocalKey(uid):legacyLocalKey;return JSON.parse(localStorage.getItem(key)||"{}")}catch{return {}}}
 function hasUsefulData(data=readLocal()){
   return Number(data.income||0)>0||Number(data.budget||0)>0||
     (Array.isArray(data.expenses)&&data.expenses.length>0)||
@@ -24,7 +26,7 @@ async function pushToCloud(data,source="save"){
   if(!db||!currentUser)throw new Error("Account Firebase non pronto o non autenticato.");
   const now=Math.max(Date.now(),localTimestamp(data)+1);
   data._sync={updatedAt:now};
-  localStorage.setItem(localKey,JSON.stringify(data));
+  localStorage.setItem(userLocalKey(currentUser.uid),JSON.stringify(data));
   await setDoc(doc(db,"users",currentUser.uid),{
     budgetData:data,
     clientUpdatedAt:now,
@@ -36,17 +38,17 @@ async function pushToCloud(data,source="save"){
 }
 
 async function applyCloudData(cloudData,cloudUpdatedAt){
-  const local=readLocal();
+  const local=readLocal(currentUser.uid);
   if(!cloudData)return {action:"none"};
   const cloudTs=Number(cloudUpdatedAt||cloudData?._sync?.updatedAt||0);
   const localTs=localTimestamp(local);
   if(!hasUsefulData(local)&&hasUsefulData(cloudData)){
-    localStorage.setItem(localKey,JSON.stringify({...cloudData,_sync:{updatedAt:cloudTs||Date.now()}}));
+    localStorage.setItem(userLocalKey(currentUser.uid),JSON.stringify({...cloudData,_sync:{updatedAt:cloudTs||Date.now()}}));
     dispatch("brcloud:loaded",{data:cloudData,source:"cloud"});
     return {action:"download"};
   }
   if(cloudTs>localTs&&cloudTs>0&&!sameData(local,cloudData)){
-    localStorage.setItem(localKey,JSON.stringify({...cloudData,_sync:{updatedAt:cloudTs}}));
+    localStorage.setItem(userLocalKey(currentUser.uid),JSON.stringify({...cloudData,_sync:{updatedAt:cloudTs}}));
     dispatch("brcloud:loaded",{data:cloudData,source:"cloud"});
     return {action:"download"};
   }
@@ -84,7 +86,7 @@ async function syncNow(){
   if(!db||!currentUser)throw new Error("Accedi a Budget Reset prima di sincronizzare.");
   const ref=doc(db,"users",currentUser.uid);
   const snap=await getDoc(ref);
-  const local=readLocal();
+  const local=readLocal(currentUser.uid);
   if(!snap.exists()){
     if(hasUsefulData(local)){await pushToCloud(local,"manual-upload");return "upload"}
     throw new Error("Il tuo account non contiene ancora dati nel cloud.");
@@ -115,21 +117,32 @@ async function startCloud(){
       if(unsubscribe){unsubscribe();unsubscribe=null}
       if(!user){readyResolve();return;}
       try{
-        const ref=doc(db,"users",user.uid),snap=await getDoc(ref),local=readLocal();
+        const ref=doc(db,"users",user.uid),snap=await getDoc(ref),local=readLocal(user.uid);
         if(!snap.exists()){
-          if(hasUsefulData(local))await pushToCloud(local,"first-login");
-          else dispatch("brcloud:sync",{direction:"ready",source:"cloud",data:local});
+          // A brand-new account must start empty. Never copy the legacy browser cache here.
+          const empty={income:0,budget:0,expenses:[],goals:[],splits:[],emergency:{},installments:[],recurringExpenses:[],incomes:[],budgets:[],scheduled:[],categories:[]};
+          await setDoc(ref,{budgetData:empty,clientUpdatedAt:Date.now(),updatedAt:serverTimestamp(),email:user.email||null},{merge:true});
+          localStorage.setItem(userLocalKey(user.uid),JSON.stringify(empty));
+          dispatch("brcloud:session-data",{uid:user.uid,data:empty,source:"new-account"});
         }else{
           const cloudData=snap.data()?.budgetData||null,cloudTs=Number(snap.data()?.clientUpdatedAt||cloudData?._sync?.updatedAt||0);
-          await applyCloudData(cloudData,cloudTs);
+          if(cloudData){
+            await applyCloudData(cloudData,cloudTs);
+            const loaded=readLocal(user.uid);
+            dispatch("brcloud:session-data",{uid:user.uid,data:loaded,source:"cloud"});
+          }else{
+            const empty=local;
+            await pushToCloud(empty,"repair-empty-cloud");
+            dispatch("brcloud:session-data",{uid:user.uid,data:empty,source:"repair"});
+          }
         }
         unsubscribe=onSnapshot(ref,snapshot=>{
           if(!snapshot.exists()||snapshot.metadata.hasPendingWrites)return;
           const cloudData=snapshot.data()?.budgetData;if(!cloudData)return;
           const cloudTs=Number(snapshot.data()?.clientUpdatedAt||cloudData?._sync?.updatedAt||0);
-          const localNow=readLocal();
+          const localNow=readLocal(currentUser.uid);
           if(cloudTs>localTimestamp(localNow)&&!sameData(localNow,cloudData)){
-            dispatch("brcloud:loaded",{data:cloudData,source:"realtime"});
+            dispatch("brcloud:session-data",{uid:currentUser.uid,data:cloudData,source:"realtime"});
           }
         });
       }catch(error){dispatch("brcloud:error",{message:error?.message||"Errore nella sincronizzazione Firebase"})}
@@ -139,7 +152,7 @@ async function startCloud(){
 }
 
 async function save(data){
-  localStorage.setItem(localKey,JSON.stringify(data));
+  localStorage.setItem(userLocalKey(currentUser.uid),JSON.stringify(data));
   await ready;
   if(!db||!currentUser)return {cloud:false};
   try{return {cloud:true,data:await pushToCloud(data,"save")}}
@@ -226,6 +239,6 @@ async function signUp(email,password){if(!auth)throw new Error("Firebase non è 
 async function signIn(email,password){if(!auth)throw new Error("Firebase non è ancora configurato.");return signInWithEmailAndPassword(auth,email,password)}
 async function resetPassword(email){if(!auth)throw new Error("Firebase non è ancora configurato.");return sendPasswordResetEmail(auth,email)}
 async function logout(){if(auth)await signOut(auth)}
-async function migrateLocal(){const data=readLocal();await ready;if(!hasUsefulData(data))throw new Error("Non ci sono dati locali da importare.");await pushToCloud(data,"migration")}
+async function migrateLocal(){await ready;if(!currentUser)throw new Error("Accedi prima al tuo account.");let data={};try{data=JSON.parse(localStorage.getItem(legacyLocalKey)||"{}")}catch{}if(!hasUsefulData(data))throw new Error("Non ci sono vecchi dati locali da importare.");await pushToCloud(data,"migration")}
 window.BRCloud={configured:firebaseConfigured,isOnline:()=>!!currentUser,signUp,signIn,signInWithGoogle,finishGoogleLinkWithPassword,resetPassword,logout,migrateLocal,save,syncNow,diagnose,getUser:()=>currentUser,whenReady:()=>ready};
 startCloud().finally(()=>handleGoogleRedirectResult());
